@@ -1,0 +1,29 @@
+.pagina { width: min(1250px, calc(100% - 32px)); margin: 24px auto 50px; }
+.painel { background: #fff; border: 1px solid #e1e5e9; border-radius: 12px; padding: 26px; margin-bottom: 22px; }
+h2 { font-size: 22px; margin: 0 0 22px; }
+h3 { margin: 0; font-size: 16px; }
+.linha, .item-linha { display: flex; align-items: flex-end; gap: 14px; }
+.campo { flex: 1; min-width: 0; display: flex; flex-direction: column; margin-bottom: 13px; }
+.campo label { font-size: 12px; font-weight: 700; margin-bottom: 7px; color: #596675; }
+input, select { width: 100%; min-height: 40px; padding: 9px 10px; border: 1px solid #cfd6de; border-radius: 6px; background: white; color: #243447; }
+.item-linha { margin: 10px 0; padding: 14px; background: #f7f8fa; border-radius: 8px; }
+.item-select { flex: 2; }
+.pequeno { flex: .7; }
+.titulo-itens, .titulo-lista { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 22px 0 10px; }
+.botoes { display: flex; gap: 10px; margin-top: 18px; }
+button { border: 0; border-radius: 6px; padding: 10px 14px; background: #243447; color: #fff; }
+.secundario { background: #e9edf1; color: #243447; }
+.perigo { background: #a73535; }
+.remover { margin-bottom: 13px; }
+.aviso, .erro { padding: 10px 12px; border-radius: 6px; }
+.aviso { background: #eef7ee; color: #286333; }
+.erro { background: #fff0f0; color: #922f2f; }
+.tabela-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #e7eaee; vertical-align: top; }
+th { background: #f5f7f9; color: #536171; font-size: 12px; text-transform: uppercase; }
+td ul { margin: 0; padding-left: 18px; min-width: 220px; }
+td li { margin-bottom: 5px; }
+.acoes { white-space: nowrap; }
+.acoes button { margin-right: 6px; }
+@media (max-width: 780px) { .linha, .item-linha { flex-direction: column; align-items: stretch; gap: 0; } .item-linha { padding: 12px; } .remover { align-self: flex-start; margin-bottom: 12px; } .painel { padding: 18px; } }

@@ -1,0 +1,40 @@
+<main class="pagina">
+  <section class="painel">
+    <h2>Catálogo e estoque</h2>
+    <nav class="abas">
+      <button type="button" [class.ativa]="aba === 'categorias'" (click)="mudarAba('categorias')">Categorias</button>
+      <button type="button" [class.ativa]="aba === 'produtos'" (click)="mudarAba('produtos')">Produtos</button>
+      <button type="button" [class.ativa]="aba === 'servicos'" (click)="mudarAba('servicos')">Serviços</button>
+      <button type="button" [class.ativa]="aba === 'entradas'" (click)="mudarAba('entradas')">Entradas</button>
+    </nav>
+    @if (mensagem) { <p class="aviso">{{ mensagem }}</p> }
+    @if (erro) { <p class="erro">{{ erro }}</p> }
+
+    @if (aba === 'categorias') {
+      <h3>{{ idEditando ? 'Alterar categoria' : 'Cadastrar categoria' }}</h3>
+      <form (ngSubmit)="salvarCategoria()"><div class="campo"><label for="categoria">Nome da categoria</label><input id="categoria" name="categoria" [(ngModel)]="categoria"></div><div class="botoes"><button type="submit">{{ idEditando ? 'Salvar alterações' : 'Cadastrar categoria' }}</button><button type="button" class="secundario" (click)="limpar()">Limpar</button></div></form>
+      <h3 class="subtitulo">Categorias cadastradas</h3><div class="tabela-wrap"><table><thead><tr><th>ID</th><th>Categoria</th><th>Ações</th></tr></thead><tbody>@for (c of categorias; track c.idcategoria) { <tr><td>{{ c.idcategoria }}</td><td>{{ c.categoria }}</td><td class="acoes"><button type="button" (click)="editarCategoria(c)">Editar</button><button type="button" class="perigo" (click)="excluirCategoria(c.idcategoria)">Excluir</button></td></tr> }</tbody></table></div>
+    }
+
+    @if (aba === 'produtos') {
+      <h3>{{ idEditando ? 'Alterar produto' : 'Cadastrar produto' }}</h3>
+      <form (ngSubmit)="salvarProduto()"><div class="linha"><div class="campo"><label for="produto">Produto</label><input id="produto" name="produto" [(ngModel)]="item"></div><div class="campo"><label for="categoriaProduto">Categoria</label><select id="categoriaProduto" name="categoriaProduto" [(ngModel)]="idCategoria"><option [ngValue]="null">Selecione</option>@for (c of categorias; track c.idcategoria) { <option [ngValue]="c.idcategoria">{{ c.categoria }}</option> }</select></div></div>
+        <div class="campo"><label for="descricaoProduto">Descrição</label><textarea id="descricaoProduto" name="descricaoProduto" [(ngModel)]="descricaoItem"></textarea></div>
+        <div class="linha"><div class="campo"><label for="precoProduto">Preço base</label><input id="precoProduto" name="precoProduto" type="number" step="0.01" [(ngModel)]="preco"></div><div class="campo"><label for="precoVenda">Preço de venda</label><input id="precoVenda" name="precoVenda" type="number" step="0.01" [(ngModel)]="precoVenda"></div><div class="campo"><label for="codigoPreco">Código de preço</label><input id="codigoPreco" name="codigoPreco" type="number" [(ngModel)]="codigoPreco"></div><div class="campo"><label for="unidade">Unidade</label><input id="unidade" name="unidade" [(ngModel)]="unidade"></div></div>
+        <div class="botoes"><button type="submit">{{ idEditando ? 'Salvar alterações' : 'Cadastrar produto' }}</button><button type="button" class="secundario" (click)="limpar()">Limpar</button></div></form>
+      <h3 class="subtitulo">Produtos cadastrados</h3><div class="tabela-wrap"><table><thead><tr><th>ID</th><th>Produto</th><th>Categoria</th><th>Preço venda</th><th>Estoque</th><th>Ações</th></tr></thead><tbody>@for (p of produtos; track p.iditem) { <tr><td>{{ p.iditem }}</td><td>{{ p.iditemNavigation?.item1 }}</td><td>{{ p.iditemNavigation?.idcategoriaNavigation?.categoria }}</td><td>R$ {{ p.precoVenda }}</td><td>{{ p.estoque?.quantidadeEstoque ?? 0 }} {{ p.unidade }}</td><td class="acoes"><button type="button" (click)="editarProduto(p)">Editar</button><button type="button" class="perigo" (click)="excluirProduto(p.iditem)">Excluir</button></td></tr> }</tbody></table></div>
+    }
+
+    @if (aba === 'servicos') {
+      <h3>{{ idEditando ? 'Alterar serviço' : 'Cadastrar serviço' }}</h3>
+      <form (ngSubmit)="salvarServico()"><div class="linha"><div class="campo"><label for="servico">Serviço</label><input id="servico" name="servico" [(ngModel)]="item"></div><div class="campo"><label for="categoriaServico">Categoria</label><select id="categoriaServico" name="categoriaServico" [(ngModel)]="idCategoria"><option [ngValue]="null">Selecione</option>@for (c of categorias; track c.idcategoria) { <option [ngValue]="c.idcategoria">{{ c.categoria }}</option> }</select></div><div class="campo"><label for="precoServico">Preço</label><input id="precoServico" name="precoServico" type="number" step="0.01" [(ngModel)]="preco"></div></div><div class="campo"><label for="descricaoServico">Descrição</label><textarea id="descricaoServico" name="descricaoServico" [(ngModel)]="descricaoItem"></textarea></div><div class="botoes"><button type="submit">{{ idEditando ? 'Salvar alterações' : 'Cadastrar serviço' }}</button><button type="button" class="secundario" (click)="limpar()">Limpar</button></div></form>
+      <h3 class="subtitulo">Serviços cadastrados</h3><div class="tabela-wrap"><table><thead><tr><th>ID</th><th>Serviço</th><th>Categoria</th><th>Preço</th><th>Ações</th></tr></thead><tbody>@for (s of servicos; track s.iditem) { <tr><td>{{ s.iditem }}</td><td>{{ s.item1 }}</td><td>{{ s.idcategoriaNavigation?.categoria }}</td><td>R$ {{ s.preco }}</td><td class="acoes"><button type="button" (click)="editarServico(s)">Editar</button><button type="button" class="perigo" (click)="excluirServico(s.iditem)">Excluir</button></td></tr> }</tbody></table></div>
+    }
+
+    @if (aba === 'entradas') {
+      <h3>Registrar entrada de produto</h3>
+      <form (ngSubmit)="salvarEntrada()"><div class="linha"><div class="campo"><label for="produtoEntrada">Produto</label><select id="produtoEntrada" name="produtoEntrada" [(ngModel)]="idItemEntrada"><option [ngValue]="null">Selecione</option>@for (p of produtos; track p.iditem) { <option [ngValue]="p.iditem">{{ p.iditemNavigation?.item1 }}</option> }</select></div><div class="campo"><label for="dataEntrada">Data de entrada</label><input id="dataEntrada" name="dataEntrada" type="date" [(ngModel)]="dataEntradaProduto"></div></div><div class="linha"><div class="campo"><label for="quantidadeEntrada">Quantidade</label><input id="quantidadeEntrada" name="quantidadeEntrada" type="number" step="any" [(ngModel)]="quantidadeEntrada"></div><div class="campo"><label for="valorEntrada">Valor unitário</label><input id="valorEntrada" name="valorEntrada" type="number" step="0.01" [(ngModel)]="valorUnitarioEntrada"></div><div class="campo"><label for="unidadeEntrada">Unidade</label><input id="unidadeEntrada" name="unidadeEntrada" [(ngModel)]="unidadeEntrada"></div></div><div class="botoes"><button type="submit">Registrar entrada</button><button type="button" class="secundario" (click)="limpar()">Limpar</button></div></form>
+      <h3 class="subtitulo">Entradas registradas</h3><div class="tabela-wrap"><table><thead><tr><th>ID</th><th>Produto</th><th>Data</th><th>Quantidade</th><th>Valor unitário</th><th>Ações</th></tr></thead><tbody>@for (e of entradas; track e.identradaProduto) { <tr><td>{{ e.identradaProduto }}</td><td>{{ e.iditemNavigation?.iditemNavigation?.item1 ?? ('Produto ' + e.iditem) }}</td><td>{{ e.dataEntradaProduto }}</td><td>{{ e.quantidadeEntrada }} {{ e.unidade }}</td><td>R$ {{ e.valorUnitarioEntrada }}</td><td><button type="button" class="perigo" (click)="excluirEntrada(e.identradaProduto)">Excluir</button></td></tr> }</tbody></table></div>
+    }
+  </section>
+</main>
