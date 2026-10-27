@@ -1,10 +1,21 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { AtletaService } from '../../services/atleta-service';
-import { EnderecoM, FuncionarioM, FuncionarioPayload, PessoaM, PessoaPayload } from '../../Models/atletaModel';
+import {
+  EnderecoM,
+  FuncionarioM,
+  FuncionarioPayload,
+  PessoaM,
+  PessoaPayload,
+} from '../../Models/atletaModel';
 
-@Component({ selector: 'app-cadastro', imports: [FormsModule], templateUrl: './cadastro.html', styleUrl: './cadastro.css' })
+@Component({
+  selector: 'app-cadastro',
+  imports: [FormsModule],
+  templateUrl: './cadastro.html',
+  styleUrl: './cadastro.css',
+})
 export class Cadastro {
   modoFuncionario = false;
   pessoas: PessoaM[] = [];
@@ -27,8 +38,12 @@ export class Cadastro {
   cargo = '';
   dataAdmissao = '';
 
-  constructor(private service: AtletaService, private route: ActivatedRoute) {
-    this.route.data.subscribe(data => {
+  constructor(
+    private service: AtletaService,
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef,
+  ) {
+    this.route.data.subscribe((data) => {
       this.modoFuncionario = !!data['funcionario'];
       this.limpar();
       this.carregar();
@@ -38,16 +53,32 @@ export class Cadastro {
   carregar(): void {
     this.erro = '';
     if (this.modoFuncionario) {
-      this.service.listFuncionarios().subscribe({ next: dados => this.funcionarios = dados, error: erro => this.mostrarErro(erro) });
+      this.service.listFuncionarios().subscribe({
+        next: (dados) => {
+          this.funcionarios = dados;
+          this.cdr.detectChanges();
+        },
+        error: (erro) => this.mostrarErro(erro),
+      });
     } else {
-      this.service.list().subscribe({ next: dados => this.pessoas = dados, error: erro => this.mostrarErro(erro) });
+      this.service.list().subscribe({
+        next: (dados) => {
+          this.pessoas = dados;
+          this.cdr.detectChanges();
+        },
+        error: (erro) => this.mostrarErro(erro),
+      });
     }
   }
 
   salvar(): void {
     this.mensagem = '';
     this.erro = '';
-    const endereco: EnderecoM = { cep: this.cep, numero: this.numero, complemento: this.complemento };
+    const endereco: EnderecoM = {
+      cep: this.cep,
+      numero: this.numero,
+      complemento: this.complemento,
+    };
     if (this.idEndereco !== null) endereco.idendereco = this.idEndereco;
     const pessoa: PessoaPayload = {
       nome: this.nome,
@@ -57,11 +88,14 @@ export class Cadastro {
       email: this.email,
       telefone: this.telefone === null ? null : Number(this.telefone),
       ativoPessoa: this.ativoPessoa,
-      enderecos: [endereco]
+      enderecos: [endereco],
     };
 
     const requisicao = this.modoFuncionario
-      ? this.service.salvarFuncionario({ ...pessoa, cargo: this.cargo, dataAdmissao: this.dataAdmissao } as FuncionarioPayload, this.idEditando ?? undefined)
+      ? this.service.salvarFuncionario(
+          { ...pessoa, cargo: this.cargo, dataAdmissao: this.dataAdmissao } as FuncionarioPayload,
+          this.idEditando ?? undefined,
+        )
       : this.service.salvarPessoa(pessoa, this.idEditando ?? undefined);
 
     requisicao.subscribe({
@@ -69,12 +103,10 @@ export class Cadastro {
         this.mensagem = this.idEditando ? 'Registro alterado.' : 'Registro cadastrado.';
         this.limpar(false);
         this.carregar();
+        this.cdr.detectChanges();
       },
-      error: erro => this.mostrarErro(erro)
+      error: (erro) => this.mostrarErro(erro),
     });
-
-    this.limpar()
-    this.carregar()
   }
 
   editarPessoa(pessoa: PessoaM): void {
@@ -105,10 +137,16 @@ export class Cadastro {
   }
 
   excluir(id: number): void {
-    const requisicao = this.modoFuncionario ? this.service.removerFuncionario(id) : this.service.removerAtleta(id);
+    const requisicao = this.modoFuncionario
+      ? this.service.removerFuncionario(id)
+      : this.service.removerAtleta(id);
     requisicao.subscribe({
-      next: () => { this.mensagem = 'Registro excluído.'; this.carregar(); },
-      error: erro => this.mostrarErro(erro)
+      next: () => {
+        this.mensagem = 'Registro excluído.';
+        this.carregar();
+        this.cdr.detectChanges();
+      },
+      error: (erro) => this.mostrarErro(erro),
     });
   }
 
@@ -127,7 +165,10 @@ export class Cadastro {
     this.complemento = '';
     this.cargo = '';
     this.dataAdmissao = '';
-    if (apagarMensagens) { this.mensagem = ''; this.erro = ''; }
+    if (apagarMensagens) {
+      this.mensagem = '';
+      this.erro = '';
+    }
   }
 
   private preencherEndereco(endereco?: EnderecoM): void {
@@ -138,6 +179,10 @@ export class Cadastro {
   }
 
   private mostrarErro(erro: any): void {
-    this.erro = erro?.error?.mensagem ?? erro?.error?.title ?? 'Não foi possível comunicar com a API. Confira se o backend está em execução.';
+    this.erro =
+      erro?.error?.mensagem ??
+      erro?.error?.title ??
+      'Não foi possível comunicar com a API. Confira se o backend está em execução.';
+    this.cdr.detectChanges();
   }
 }

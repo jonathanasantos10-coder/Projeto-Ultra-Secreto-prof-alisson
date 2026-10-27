@@ -1,1 +1,58 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  color-scheme: light;
+  --oliva-950: #1b241d;
+  --oliva-900: #253329;
+  --oliva-800: #314435;
+  --oliva-700: #405844;
+  --oliva-100: #e4e8df;
+  --areia-50: #fbfaf5;
+  --areia-100: #f2f0e6;
+  --areia-200: #e8e5d8;
+  --areia-300: #d4d0bf;
+  --areia-500: #aaa58e;
+  --texto: #252c26;
+  --texto-suave: #62695f;
+  --dourado: #b49a5b;
+  --vermelho: #923b35;
+  --vermelho-claro: #f7e9e5;
+  --verde-claro: #e9f0e5;
+  --borda: #d6d4c7;
+  --sombra: 0 6px 20px rgb(31 41 32 / 7%);
+  font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+  color: var(--texto);
+  background: var(--areia-200);
+}
+
+* { box-sizing: border-box; }
+html { min-width: 320px; background: var(--areia-200); }
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: var(--areia-100);
+  color: var(--texto);
+  line-height: 1.5;
+}
+
+body::before {
+  content: "";
+  display: block;
+  height: 5px;
+  background: var(--dourado);
+  border-bottom: 1px solid rgb(0 0 0 / 12%);
+}
+
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible {
+  outline: 3px solid rgb(180 154 91 / 70%);
+  outline-offset: 2px;
+}
+a { color: inherit; }
+h1, h2, h3, p { overflow-wrap: anywhere; }
+h2, h3 { margin-top: 0; }
+::selection { color: white; background: var(--oliva-700); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}

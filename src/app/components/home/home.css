@@ -1,7 +1,97 @@
-#home { width: min(1100px, calc(100% - 32px)); min-height: 430px; margin: 34px auto; padding: clamp(24px, 5vw, 56px); display: flex; flex-direction: column; justify-content: center; border: 1px solid #e1e5e9; border-radius: 14px; background: #fff; color: #243447; }
-.eyebrow { text-transform: uppercase; letter-spacing: 3px; font-size: 12px; font-weight: 700; color: #b36b25; }
-h1 { max-width: 740px; font-size: clamp(30px, 5vw, 48px); margin: 12px 0; }
-.descricao { max-width: 700px; line-height: 1.7; color: #596675; }
-.atalhos { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
-.atalhos a { display: inline-block; padding: 12px 16px; background: #243447; color: #fff; text-decoration: none; border-radius: 7px; }
-.atalhos a:hover { background: #b36b25; }
+#home {
+  position: relative;
+  isolation: isolate;
+  width: min(1100px, calc(100% - 36px));
+  min-height: 470px;
+  margin: 34px auto 52px;
+  padding: clamp(28px, 5vw, 64px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid var(--borda);
+  border-top: 6px solid var(--oliva-700);
+  border-radius: 3px;
+  background: var(--areia-50);
+  color: var(--oliva-950);
+  box-shadow: var(--sombra);
+}
+
+#home::after {
+  content: "INTRANET · ADMINISTRAÇÃO E LOGÍSTICA";
+  position: absolute;
+  z-index: -1;
+  right: -16px;
+  bottom: 24px;
+  color: rgb(49 68 53 / 5%);
+  font-size: clamp(22px, 4vw, 48px);
+  font-weight: 900;
+  letter-spacing: 3px;
+  white-space: nowrap;
+  transform: rotate(-4deg);
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  color: var(--oliva-700);
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.eyebrow::before { content: ""; width: 26px; height: 3px; background: var(--dourado); }
+
+h1 {
+  max-width: 740px;
+  margin: 0;
+  font-size: clamp(30px, 4.5vw, 48px);
+  line-height: 1.12;
+  font-weight: 800;
+  letter-spacing: -.8px;
+  color: var(--oliva-900);
+}
+
+.descricao {
+  max-width: 700px;
+  margin: 20px 0 0;
+  line-height: 1.8;
+  color: var(--texto-suave);
+  font-size: 16px;
+}
+
+.atalhos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.atalhos a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 12px 17px;
+  border: 1px solid var(--oliva-800);
+  border-radius: 3px;
+  background: var(--oliva-800);
+  color: #fffdf5;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 13px;
+  transition: background-color .16s ease, transform .16s ease;
+}
+
+.atalhos a::before { content: "›"; margin-right: 9px; color: #d8c48f; font-size: 20px; line-height: 12px; }
+.atalhos a:hover { background: var(--oliva-950); transform: translateY(-1px); }
+
+@media (max-width: 600px) {
+  #home { width: calc(100% - 24px); min-height: 0; margin: 18px auto 30px; padding: 28px 22px 36px; }
+  .descricao { font-size: 14px; }
+  .atalhos { display: grid; grid-template-columns: 1fr; }
+  .atalhos a { width: 100%; }
+}

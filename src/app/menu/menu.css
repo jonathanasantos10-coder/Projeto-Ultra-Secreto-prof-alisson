@@ -1,7 +1,76 @@
-#cabecalho { width: min(1250px, calc(100% - 32px)); margin: 0 auto; min-height: 78px; display: flex; justify-content: space-between; align-items: center; gap: 20px; border-bottom: 1px solid #dfe4e9; }
-#logo { color: #243447; display: flex; flex-direction: column; gap: 4px; font-weight: 800; font-size: 20px; text-decoration: none; white-space: nowrap; }
-#logo span { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #b36b25; }
-#menu { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-#menu a { color: #243447; text-decoration: none; font-size: 14px; padding: 10px 12px; border-radius: 6px; }
-#menu a:hover { background: #e9edf1; }
-@media (max-width: 900px) { #cabecalho { align-items: flex-start; flex-direction: column; padding: 18px 0; } #menu { justify-content: flex-start; } #menu a { padding: 8px; } }
+:host { display: block; }
+
+#cabecalho {
+  width: 100%;
+  min-height: 88px;
+  padding: 16px max(24px, calc((100vw - 1250px) / 2));
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 22px;
+  background: var(--oliva-900);
+  color: var(--areia-50);
+  border-bottom: 4px solid var(--dourado);
+  box-shadow: 0 4px 14px rgb(27 36 29 / 18%);
+}
+
+#logo {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    text-decoration: none;
+    border: none;
+    padding: 0;
+}
+
+#logo img {
+    display: block;
+    width: auto;
+    height: 56px;
+    max-width: 220px;
+    object-fit: contain;
+    object-position: left center;
+    border: none;
+}
+
+#menu {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+#menu a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 9px 12px;
+  color: #f6f4e9;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: .2px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  transition: background-color .16s ease, border-color .16s ease;
+}
+
+#menu a:hover {
+  background: var(--oliva-800);
+  border-color: rgb(212 208 191 / 25%);
+}
+
+#menu a:focus-visible { outline-color: var(--dourado); }
+
+@media (max-width: 920px) {
+  #cabecalho { align-items: flex-start; flex-direction: column; padding: 18px 20px 14px; gap: 14px; }
+  #menu { justify-content: flex-start; }
+  #menu a { padding: 8px 10px; }
+}
+
+@media (max-width: 480px) {
+  #menu { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #menu a { justify-content: flex-start; padding-left: 8px; }
+}
