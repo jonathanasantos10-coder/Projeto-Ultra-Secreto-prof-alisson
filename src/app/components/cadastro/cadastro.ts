@@ -72,6 +72,9 @@ export class Cadastro {
       },
       error: erro => this.mostrarErro(erro)
     });
+
+    this.limpar()
+    this.carregar()
   }
 
   editarPessoa(pessoa: PessoaM): void {
