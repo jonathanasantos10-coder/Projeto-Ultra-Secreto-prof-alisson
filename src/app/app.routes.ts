@@ -1,15 +1,15 @@
 import { Routes } from '@angular/router';
 import { Home } from './components/home/home';
-import { Cadastro } from './components/cadastro/cadastro';
-import { CadastroCorrida } from './components/Atendimento/atendimento';
-import { Gestao } from './components/gestao/gestao';
+import { CadastroMilitar } from './components/cadastro-militar/cadastro-militar';
+import { Atendimento } from './components/atendimento/atendimento';
+import { Almoxarifado } from './components/almoxarifado/almoxarifado';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: Home },
-  { path: 'pessoas', component: Cadastro, data: { funcionario: false } },
-  { path: 'funcionarios', component: Cadastro, data: { funcionario: true } },
-  { path: 'atendimentos', component: CadastroCorrida },
-  { path: 'gestao', component: Gestao },
+  { path: 'guerreiros', component: CadastroMilitar, data: { intendencia: false } },
+  { path: 'intendencia', component: CadastroMilitar, data: { intendencia: true } },
+  { path: 'atendimentos', component: Atendimento },
+  { path: 'almoxarifado', component: Almoxarifado },
   { path: '**', redirectTo: 'home' }
 ];

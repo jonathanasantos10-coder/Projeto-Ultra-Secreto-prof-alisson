@@ -1,0 +1,79 @@
+<main class="pagina">
+  <section class="painel">
+    <h2>{{ modoIntendencia ? 'Cadastro de Intendência' : 'Cadastro de Guerreiro' }}</h2>
+    @if (mensagem) { <p class="aviso">{{ mensagem }}</p> }
+    @if (erro) { <p class="erro">{{ erro }}</p> }
+
+    <form (ngSubmit)="salvar()">
+      <div class="campo"><label for="nome">Nome completo</label><input id="nome" name="nome" [(ngModel)]="nome"></div>
+      <div class="linha">
+        <div class="campo"><label for="cpf">CPF</label><input id="cpf" name="cpf" type="number" [(ngModel)]="cpf"></div>
+        <div class="campo"><label for="dataNascimento">Data de nascimento</label><input id="dataNascimento" name="dataNascimento" type="date" [(ngModel)]="dataNascimento"></div>
+        <div class="campo"><label for="sexo">Sexo</label><select id="sexo" name="sexo" [(ngModel)]="sexo"><option value="M">Masculino</option><option value="F">Feminino</option><option value="N">Não informado</option></select></div>
+      </div>
+      <div class="linha">
+        <div class="campo"><label for="email">E-mail</label><input id="email" name="email" type="email" [(ngModel)]="email"></div>
+        <div class="campo"><label for="telefone">Telefone</label><input id="telefone" name="telefone" type="number" [(ngModel)]="telefone"></div>
+      </div>
+      <h3>Endereço</h3>
+      <div class="linha">
+        <div class="campo"><label for="cep">CEP</label><input id="cep" name="cep" [(ngModel)]="cep"></div>
+        <div class="campo"><label for="numero">Número</label><input id="numero" name="numero" [(ngModel)]="numero"></div>
+        <div class="campo"><label for="complemento">Complemento</label><input id="complemento" name="complemento" [(ngModel)]="complemento"></div>
+      </div>
+      @if (modoIntendencia) {
+        <h3>Dados da Intendência</h3>
+        <div class="linha">
+          <div class="campo"><label for="cargo">Função na Intendência</label><input id="cargo" name="cargo" [(ngModel)]="cargo"></div>
+          <div class="campo"><label for="dataAdmissao">Data de admissão</label><input id="dataAdmissao" name="dataAdmissao" type="date" [(ngModel)]="dataAdmissao"></div>
+        </div>
+      }
+      <div class="botoes">
+        <button type="submit">{{ idEditando ? 'Salvar alterações' : (modoIntendencia ? 'Cadastrar na Intendência' : 'Cadastrar Guerreiro') }}</button>
+        <button type="button" class="secundario" (click)="limpar()">Limpar</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="painel">
+    <div class="titulo-lista">
+      <h2>{{ modoIntendencia ? 'Integrantes da Intendência' : 'Guerreiros cadastrados' }}</h2>
+      <button type="button" class="secundario" (click)="carregar()">Atualizar lista</button>
+    </div>
+    @if (modoIntendencia) {
+      <div class="tabela-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Nome</th><th>Função</th><th>E-mail</th><th>Ações</th></tr></thead>
+          <tbody>
+            @for (integrante of integrantesIntendencia; track integrante.idpessoa) {
+              <tr>
+                <td>{{ integrante.idpessoa }}</td>
+                <td>{{ integrante.idpessoaNavigation?.nome }}</td>
+                <td>{{ integrante.cargo }}</td>
+                <td>{{ integrante.idpessoaNavigation?.email }}</td>
+                <td class="acoes"><button type="button" (click)="editarIntendencia(integrante)">Editar</button><button type="button" class="perigo" (click)="excluir(integrante.idpessoa)">Excluir</button></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="tabela-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Nome</th><th>CPF</th><th>E-mail</th><th>Ações</th></tr></thead>
+          <tbody>
+            @for (guerreiro of guerreiros; track guerreiro.idpessoa) {
+              <tr>
+                <td>{{ guerreiro.idpessoa }}</td>
+                <td>{{ guerreiro.nome }}</td>
+                <td>{{ guerreiro.cpf }}</td>
+                <td>{{ guerreiro.email }}</td>
+                <td class="acoes"><button type="button" (click)="editarGuerreiro(guerreiro)">Editar</button><button type="button" class="perigo" (click)="excluir(guerreiro.idpessoa)">Excluir</button></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+</main>

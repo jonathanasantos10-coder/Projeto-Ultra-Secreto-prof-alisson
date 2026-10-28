@@ -1,25 +1,21 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { AtletaService } from '../../services/atleta-service';
-import {
-  EnderecoM,
-  FuncionarioM,
-  FuncionarioPayload,
-  PessoaM,
-  PessoaPayload,
-} from '../../Models/atletaModel';
+import { GuerreiroService } from '../../services/guerreiro.service';
+import { IntendenciaService } from '../../services/intendencia.service';
+import { EnderecoModel, GuerreiroModel, GuerreiroPayload } from '../../models/guerreiro.model';
+import { IntendenciaModel, IntendenciaPayload } from '../../models/intendencia.model';
 
 @Component({
-  selector: 'app-cadastro',
+  selector: 'app-cadastro-militar',
   imports: [FormsModule],
-  templateUrl: './cadastro.html',
-  styleUrl: './cadastro.css',
+  templateUrl: './cadastro-militar.html',
+  styleUrl: './cadastro-militar.css',
 })
-export class Cadastro {
-  modoFuncionario = false;
-  pessoas: PessoaM[] = [];
-  funcionarios: FuncionarioM[] = [];
+export class CadastroMilitar {
+  modoIntendencia = false;
+  guerreiros: GuerreiroModel[] = [];
+  integrantesIntendencia: IntendenciaModel[] = [];
   idEditando: number | null = null;
   idEndereco: number | null = null;
   mensagem = '';
@@ -31,7 +27,7 @@ export class Cadastro {
   sexo = 'N';
   email = '';
   telefone: number | null = null;
-  ativoPessoa = 'S';
+  ativoPessoa = 'A';
   cep = '';
   numero = '';
   complemento = '';
@@ -39,12 +35,13 @@ export class Cadastro {
   dataAdmissao = '';
 
   constructor(
-    private service: AtletaService,
+    private guerreiroService: GuerreiroService,
+    private intendenciaService: IntendenciaService,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
   ) {
     this.route.data.subscribe((data) => {
-      this.modoFuncionario = !!data['funcionario'];
+      this.modoIntendencia = !!data['intendencia'];
       this.limpar();
       this.carregar();
     });
@@ -52,18 +49,18 @@ export class Cadastro {
 
   carregar(): void {
     this.erro = '';
-    if (this.modoFuncionario) {
-      this.service.listFuncionarios().subscribe({
+    if (this.modoIntendencia) {
+      this.intendenciaService.listar().subscribe({
         next: (dados) => {
-          this.funcionarios = dados;
+          this.integrantesIntendencia = dados;
           this.cdr.detectChanges();
         },
         error: (erro) => this.mostrarErro(erro),
       });
     } else {
-      this.service.list().subscribe({
+      this.guerreiroService.listar().subscribe({
         next: (dados) => {
-          this.pessoas = dados;
+          this.guerreiros = dados;
           this.cdr.detectChanges();
         },
         error: (erro) => this.mostrarErro(erro),
@@ -74,29 +71,34 @@ export class Cadastro {
   salvar(): void {
     this.mensagem = '';
     this.erro = '';
-    const endereco: EnderecoM = {
+    const endereco: EnderecoModel = {
+      idendereco: this.idEndereco ?? 0,
       cep: this.cep,
       numero: this.numero,
       complemento: this.complemento,
     };
-    if (this.idEndereco !== null) endereco.idendereco = this.idEndereco;
-    const pessoa: PessoaPayload = {
+
+    const guerreiro: GuerreiroPayload = {
       nome: this.nome,
       cpf: Number(this.cpf ?? 0),
       dataNascimento: this.dataNascimento,
       sexo: this.sexo,
       email: this.email,
       telefone: this.telefone === null ? null : Number(this.telefone),
-      ativoPessoa: this.ativoPessoa,
+      ativoPessoa: 'A',
       enderecos: [endereco],
     };
 
-    const requisicao = this.modoFuncionario
-      ? this.service.salvarFuncionario(
-          { ...pessoa, cargo: this.cargo, dataAdmissao: this.dataAdmissao } as FuncionarioPayload,
+    const requisicao = this.modoIntendencia
+      ? this.intendenciaService.salvar(
+          {
+            ...guerreiro,
+            cargo: this.cargo,
+            dataAdmissao: this.dataAdmissao,
+          } as IntendenciaPayload,
           this.idEditando ?? undefined,
         )
-      : this.service.salvarPessoa(pessoa, this.idEditando ?? undefined);
+      : this.guerreiroService.salvar(guerreiro, this.idEditando ?? undefined);
 
     requisicao.subscribe({
       next: () => {
@@ -109,37 +111,38 @@ export class Cadastro {
     });
   }
 
-  editarPessoa(pessoa: PessoaM): void {
-    this.idEditando = pessoa.idpessoa;
-    this.nome = pessoa.nome ?? '';
-    this.cpf = pessoa.cpf ?? null;
-    this.dataNascimento = (pessoa.dataNascimento ?? '').substring(0, 10);
-    this.sexo = pessoa.sexo ?? 'N';
-    this.email = pessoa.email ?? '';
-    this.telefone = pessoa.telefone ?? null;
-    this.ativoPessoa = pessoa.ativoPessoa ?? 'S';
-    this.preencherEndereco(pessoa.enderecos?.[0]);
+  editarGuerreiro(guerreiro: GuerreiroModel): void {
+    this.idEditando = guerreiro.idpessoa;
+    this.nome = guerreiro.nome ?? '';
+    this.cpf = guerreiro.cpf ?? null;
+    this.dataNascimento = (guerreiro.dataNascimento ?? '').substring(0, 10);
+    this.sexo = guerreiro.sexo ?? 'N';
+    this.email = guerreiro.email ?? '';
+    this.telefone = guerreiro.telefone ?? null;
+    this.preencherEndereco(guerreiro.enderecos?.[0]);
+    this.cdr.detectChanges();
   }
 
-  editarFuncionario(funcionario: FuncionarioM): void {
-    const pessoa = funcionario.idpessoaNavigation;
-    this.idEditando = funcionario.idpessoa;
-    this.nome = pessoa?.nome ?? '';
-    this.cpf = pessoa?.cpf ?? null;
-    this.dataNascimento = (pessoa?.dataNascimento ?? '').substring(0, 10);
-    this.sexo = pessoa?.sexo ?? 'N';
-    this.email = pessoa?.email ?? '';
-    this.telefone = pessoa?.telefone ?? null;
-    this.ativoPessoa = pessoa?.ativoPessoa ?? 'S';
-    this.preencherEndereco(pessoa?.enderecos?.[0]);
-    this.cargo = funcionario.cargo ?? '';
-    this.dataAdmissao = (funcionario.dataAdmissao ?? '').substring(0, 10);
+  editarIntendencia(integrante: IntendenciaModel): void {
+    const guerreiro = integrante.idpessoaNavigation;
+    this.idEditando = integrante.idpessoa;
+    this.nome = guerreiro?.nome ?? '';
+    this.cpf = guerreiro?.cpf ?? null;
+    this.dataNascimento = (guerreiro?.dataNascimento ?? '').substring(0, 10);
+    this.sexo = guerreiro?.sexo ?? 'N';
+    this.email = guerreiro?.email ?? '';
+    this.telefone = guerreiro?.telefone ?? null;
+    this.preencherEndereco(guerreiro?.enderecos?.[0]);
+    this.cargo = integrante.cargo ?? '';
+    this.dataAdmissao = (integrante.dataAdmissao ?? '').substring(0, 10);
+    this.cdr.detectChanges();
   }
 
   excluir(id: number): void {
-    const requisicao = this.modoFuncionario
-      ? this.service.removerFuncionario(id)
-      : this.service.removerAtleta(id);
+    const requisicao = this.modoIntendencia
+      ? this.intendenciaService.excluir(id)
+      : this.guerreiroService.excluir(id);
+
     requisicao.subscribe({
       next: () => {
         this.mensagem = 'Registro excluído.';
@@ -159,7 +162,7 @@ export class Cadastro {
     this.sexo = 'N';
     this.email = '';
     this.telefone = null;
-    this.ativoPessoa = 'S';
+    this.ativoPessoa = 'A';
     this.cep = '';
     this.numero = '';
     this.complemento = '';
@@ -169,9 +172,10 @@ export class Cadastro {
       this.mensagem = '';
       this.erro = '';
     }
+1
   }
 
-  private preencherEndereco(endereco?: EnderecoM): void {
+  private preencherEndereco(endereco?: EnderecoModel): void {
     this.idEndereco = endereco?.idendereco ?? null;
     this.cep = endereco?.cep ?? '';
     this.numero = endereco?.numero ?? '';

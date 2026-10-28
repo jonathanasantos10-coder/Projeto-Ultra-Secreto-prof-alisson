@@ -5,7 +5,7 @@
     @if (erro) { <p class="erro">{{ erro }}</p> }
     <form (ngSubmit)="salvar()">
       <div class="linha">
-        <div class="campo"><label for="pessoa">Pessoa solicitante</label><select id="pessoa" name="pessoa" [(ngModel)]="idPessoa"><option [ngValue]="null">Selecione</option>@for (p of pessoas; track p.idpessoa) { <option [ngValue]="p.idpessoa">{{ p.nome }}</option> }</select></div>
+        <div class="campo"><label for="guerreiro">Guerreiro solicitante</label><select id="guerreiro" name="guerreiro" [(ngModel)]="idGuerreiro"><option [ngValue]="null">Selecione</option>@for (guerreiro of guerreiros; track guerreiro.idpessoa) { <option [ngValue]="guerreiro.idpessoa">{{ guerreiro.nome }}</option> }</select></div>
         <div class="campo"><label for="dataAtendimento">Data do atendimento</label><input id="dataAtendimento" name="dataAtendimento" type="date" [(ngModel)]="dataAtendimento"></div>
         <div class="campo"><label for="statusAtendimento">Status</label><select id="statusAtendimento" name="statusAtendimento" [(ngModel)]="statusAtendimento"><option value="A">Aberto</option><option value="C">Concluído</option><option value="P">Pendente</option></select></div>
       </div>
@@ -13,7 +13,7 @@
       @for (linha of linhas; track $index; let i = $index) {
         <div class="item-linha">
           <div class="campo item-select"><label [for]="'item' + i">Produto ou serviço</label><select [id]="'item' + i" [name]="'item' + i" [(ngModel)]="linha.idItem"><option [ngValue]="null">Selecione</option>@for (item of opcoesItens; track item.iditem) { <option [ngValue]="item.iditem">{{ item.tipo === 'P' ? 'Produto' : 'Serviço' }} · {{ item.descricao }} (R$ {{ item.preco }})</option> }</select></div>
-          <div class="campo"><label [for]="'funcionario' + i">Funcionário</label><select [id]="'funcionario' + i" [name]="'funcionario' + i" [(ngModel)]="linha.idFuncionario"><option [ngValue]="null">Selecione</option>@for (f of funcionarios; track f.idpessoa) { <option [ngValue]="f.idpessoa">{{ f.idpessoaNavigation?.nome }} · {{ f.cargo }}</option> }</select></div>
+          <div class="campo"><label [for]="'intendencia' + i">Intendência responsável</label><select [id]="'intendencia' + i" [name]="'intendencia' + i" [(ngModel)]="linha.idFuncionario"><option [ngValue]="null">Selecione</option>@for (integrante of integrantesIntendencia; track integrante.idpessoa) { <option [ngValue]="integrante.idpessoa">{{ integrante.idpessoaNavigation?.nome }} · {{ integrante.cargo }}</option> }</select></div>
           <div class="campo pequeno"><label [for]="'quantidade' + i">Quantidade</label><input [id]="'quantidade' + i" [name]="'quantidade' + i" type="number" [(ngModel)]="linha.quantidadeItens"></div>
           <div class="campo pequeno"><label [for]="'valor' + i">Valor unitário</label><input [id]="'valor' + i" [name]="'valor' + i" type="number" step="0.01" [(ngModel)]="linha.valorUnitarioEntrada"></div>
           @if (linhas.length > 1) { <button type="button" class="perigo remover" (click)="removerLinha(i)">Remover</button> }
@@ -25,9 +25,9 @@
 
   <section class="painel">
     <div class="titulo-lista"><h2>Atendimentos registrados</h2><button type="button" class="secundario" (click)="carregar()">Atualizar lista</button></div>
-    <div class="tabela-wrap"><table><thead><tr><th>ID</th><th>Solicitante</th><th>Data</th><th>Status</th><th>Itens</th><th>Ações</th></tr></thead><tbody>
-      @for (a of atendimentos; track a.idAtendimento) {
-        <tr><td>{{ a.idAtendimento }}</td><td>{{ a.nomePessoa ?? ('Pessoa ' + a.idPessoa) }}</td><td>{{ a.dataAtendimento }}</td><td>{{ a.statusAtendimento }}</td><td><ul>@for (item of a.itens; track $index) { <li>{{ item.item ?? ('Item ' + item.idItem) }} — {{ item.quantidadeItens }} × R$ {{ item.valorUnitarioEntrada }} ({{ item.nomeFuncionario ?? ('Funcionário ' + item.idFuncionario) }})</li> }</ul></td><td class="acoes"><button type="button" (click)="editar(a)">Editar</button><button type="button" class="perigo" (click)="excluir(a.idAtendimento)">Excluir</button></td></tr>
+    <div class="tabela-wrap"><table><thead><tr><th>ID</th><th>Guerreiro solicitante</th><th>Data</th><th>Status</th><th>Itens</th><th>Ações</th></tr></thead><tbody>
+      @for (atendimento of atendimentos; track atendimento.idAtendimento) {
+        <tr><td>{{ atendimento.idAtendimento }}</td><td>{{ atendimento.nomePessoa ?? ('Guerreiro ' + atendimento.idPessoa) }}</td><td>{{ atendimento.dataAtendimento }}</td><td>{{ atendimento.statusAtendimento }}</td><td><ul>@for (item of atendimento.itens; track $index) { <li>{{ item.item ?? ('Item ' + item.idItem) }} — {{ item.quantidadeItens }} × R$ {{ item.valorUnitarioEntrada }} ({{ item.nomeFuncionario ?? ('Intendência ' + item.idFuncionario) }})</li> }</ul></td><td class="acoes"><button type="button" (click)="editar(atendimento)">Editar</button><button type="button" class="perigo" (click)="excluir(atendimento.idAtendimento)">Excluir</button></td></tr>
       }
     </tbody></table></div>
   </section>

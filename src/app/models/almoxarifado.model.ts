@@ -1,6 +1,9 @@
-export interface CategoriaM { idcategoria: number; categoria: string; }
+export interface CategoriaModel {
+  idcategoria: number;
+  categoria: string;
+}
 
-export interface ItemM {
+export interface ItemCatalogoModel {
   iditem: number;
   idcategoria: number;
   item1: string;
@@ -8,26 +11,26 @@ export interface ItemM {
   preco: number;
   tipoItem: string;
   ativoProdutoServico?: string;
-  idcategoriaNavigation?: CategoriaM;
+  idcategoriaNavigation?: CategoriaModel;
 }
 
-export interface ProdutoM {
+export interface ProdutoModel {
   iditem: number;
   codigoPreco?: number;
   precoVenda?: number;
   unidade?: string;
   estoque?: { iditem: number; quantidadeEstoque: number };
-  iditemNavigation: ItemM;
+  iditemNavigation: ItemCatalogoModel;
 }
 
-export interface EntradaM {
+export interface EntradaProdutoModel {
   identradaProduto: number;
   iditem: number;
   dataEntradaProduto: string;
   quantidadeEntrada: number;
   unidade?: string;
   valorUnitarioEntrada: number;
-  iditemNavigation?: ProdutoM;
+  iditemNavigation?: ProdutoModel;
 }
 
 export interface ItemOpcao {

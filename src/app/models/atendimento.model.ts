@@ -12,19 +12,18 @@ export interface AtendimentoPayload {
   itens: ItemAtendimentoPayload[];
 }
 
-export interface AtendimentoItemM extends ItemAtendimentoPayload {
+export interface AtendimentoItemModel extends ItemAtendimentoPayload {
   idAtendimento: number;
-  idItem: number;
   item?: string;
   nomeFuncionario?: string;
   cargo?: string;
 }
 
-export interface AtendimentoM {
+export interface AtendimentoModel {
   idAtendimento: number;
   idPessoa: number;
   nomePessoa?: string;
   dataAtendimento: string;
   statusAtendimento: string;
-  itens: AtendimentoItemM[];
+  itens: AtendimentoItemModel[];
 }
