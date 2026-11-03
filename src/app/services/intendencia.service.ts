@@ -6,19 +6,26 @@ import { API_URL } from './api-config';
 
 @Injectable({ providedIn: 'root' })
 export class IntendenciaService {
+  // CadastroMilitarController: GET/POST/PUT/DELETE Funcionario.
   private readonly url = `${API_URL}/Funcionario`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
   listar(): Observable<IntendenciaModel[]> {
     return this.http.get<IntendenciaModel[]>(this.url);
   }
 
-  salvar(dados: IntendenciaPayload, id?: number): Observable<unknown> {
-    return id ? this.http.put(`${this.url}/${id}`, dados) : this.http.post(this.url, dados);
+  consultar(id: number): Observable<IntendenciaModel> {
+    return this.http.get<IntendenciaModel>(`${this.url}/${id}`);
   }
 
-  excluir(id: number): Observable<unknown> {
-    return this.http.delete(`${this.url}/${id}`);
+  salvar(dados: IntendenciaPayload, id?: number): Observable<unknown> {
+    return id == null
+      ? this.http.post<IntendenciaModel>(this.url, dados)
+      : this.http.put<void>(`${this.url}/${id}`, dados);
+  }
+
+  excluir(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.url}/${id}`);
   }
 }

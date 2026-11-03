@@ -17,9 +17,12 @@ export interface AtendimentoItemModel extends ItemAtendimentoPayload {
   item?: string;
   nomeFuncionario?: string;
   cargo?: string;
+  subtotal?: number;
 }
 
 export interface AtendimentoModel {
+  valorTotal: number;
+  enderecos: import('./guerreiro.model').EnderecoModel[];
   idAtendimento: number;
   idPessoa: number;
   nomePessoa?: string;

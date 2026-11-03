@@ -1,11 +1,34 @@
 <main id="home">
-  <p class="eyebrow">Sistema interno</p>
+  <p class="eyebrow">Painel administrativo · Visão geral</p>
   <h1>Intranet da Intendência</h1>
-  <p class="descricao">Cadastre guerreiros e integrantes da Intendência, organize categorias, produtos e serviços, registre entradas no estoque e acompanhe atendimentos.</p>
-  <nav class="atalhos">
-    <a routerLink="/guerreiros">Cadastrar Guerreiro</a>
-    <a routerLink="/intendencia">Cadastrar na Intendência</a>
-    <a routerLink="/almoxarifado">Gerenciar almoxarifado</a>
-    <a routerLink="/atendimentos">Novo atendimento</a>
-  </nav>
+  <p class="descricao">
+    Acompanhe os cadastros, o catálogo, as entradas, o estoque e os atendimentos em um só lugar.
+  </p>
+
+  @if (erro()) {
+    <p class="erro" role="alert">{{ erro() }}</p>
+  }
+
+  @if (carregando()) {
+    <p class="estado-resumo" role="status">Consultando resumo do sistema…</p>
+  }
+
+  @if (!carregando() && !erro()) {
+    <section class="secao-resumo" aria-labelledby="titulo-resumo">
+      <div class="cabecalho-resumo">
+        <h2 id="titulo-resumo">Resumo do sistema</h2>
+        <span>{{ resumo().length }} indicadores</span>
+      </div>
+
+      <div class="grade-resumo">
+        @for (c of resumo(); track c.nome) {
+          <a class="cartao-resumo" [routerLink]="c.rota">
+            <span class="cartao-resumo__titulo">{{ c.nome }}</span>
+            <strong class="cartao-resumo__valor">{{ c.valor }}</strong>
+            <span class="cartao-resumo__acao">Consultar <span aria-hidden="true">→</span></span>
+          </a>
+        }
+      </div>
+    </section>
+  }
 </main>

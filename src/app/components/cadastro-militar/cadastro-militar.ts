@@ -1,6 +1,10 @@
+import { IdentificacaoService } from '../../services/identificacao.service';
+import { ConsultaId } from '../consulta-id/consulta-id';
+import { Validacao } from '../validacao/validacao';
+import { retornoApi } from '../../services/retorno-api';
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { GuerreiroService } from '../../services/guerreiro.service';
 import { IntendenciaService } from '../../services/intendencia.service';
 import { EnderecoModel, GuerreiroModel, GuerreiroPayload } from '../../models/guerreiro.model';
@@ -8,12 +12,16 @@ import { IntendenciaModel, IntendenciaPayload } from '../../models/intendencia.m
 
 @Component({
   selector: 'app-cadastro-militar',
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink, ConsultaId, Validacao],
   templateUrl: './cadastro-militar.html',
   styleUrl: './cadastro-militar.css',
 })
 export class CadastroMilitar {
   modoIntendencia = false;
+  publico = false;
+  enderecosAdicionais: EnderecoModel[] = [];
+  carregando = false;
+  salvando = false;
   guerreiros: GuerreiroModel[] = [];
   integrantesIntendencia: IntendenciaModel[] = [];
   idEditando: number | null = null;
@@ -39,9 +47,12 @@ export class CadastroMilitar {
     private intendenciaService: IntendenciaService,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
+    private identificacao: IdentificacaoService,
+    private router: Router,
   ) {
     this.route.data.subscribe((data) => {
       this.modoIntendencia = !!data['intendencia'];
+      this.publico = !!data['publico'];
       this.limpar();
       this.carregar();
     });
@@ -49,10 +60,13 @@ export class CadastroMilitar {
 
   carregar(): void {
     this.erro = '';
+    if (this.publico) return;
+    this.carregando = true;
     if (this.modoIntendencia) {
       this.intendenciaService.listar().subscribe({
         next: (dados) => {
           this.integrantesIntendencia = dados;
+          this.carregando = false;
           this.cdr.detectChanges();
         },
         error: (erro) => this.mostrarErro(erro),
@@ -61,6 +75,7 @@ export class CadastroMilitar {
       this.guerreiroService.listar().subscribe({
         next: (dados) => {
           this.guerreiros = dados;
+          this.carregando = false;
           this.cdr.detectChanges();
         },
         error: (erro) => this.mostrarErro(erro),
@@ -69,6 +84,8 @@ export class CadastroMilitar {
   }
 
   salvar(): void {
+    if (this.salvando) return;
+    this.salvando = true;
     this.mensagem = '';
     this.erro = '';
     const endereco: EnderecoModel = {
@@ -84,9 +101,9 @@ export class CadastroMilitar {
       dataNascimento: this.dataNascimento,
       sexo: this.sexo,
       email: this.email,
-      telefone: this.telefone === null ? null : Number(this.telefone),
-      ativoPessoa: 'A',
-      enderecos: [endereco],
+      telefone: Number(this.telefone ?? 0),
+      ativoPessoa: this.ativoPessoa,
+      enderecos: [endereco, ...this.enderecosAdicionais],
     };
 
     const requisicao = this.modoIntendencia
@@ -102,6 +119,16 @@ export class CadastroMilitar {
 
     requisicao.subscribe({
       next: () => {
+        this.salvando = false;
+        if (this.publico) {
+          this.identificacao
+            .entrar(guerreiro.cpf, guerreiro.dataNascimento)
+            .subscribe({
+              next: () => this.router.navigate(['/carrinho']),
+              error: (e) => this.mostrarErro(e),
+            });
+          return;
+        }
         this.mensagem = this.idEditando ? 'Registro alterado.' : 'Registro cadastrado.';
         this.limpar(false);
         this.carregar();
@@ -119,6 +146,8 @@ export class CadastroMilitar {
     this.sexo = guerreiro.sexo ?? 'N';
     this.email = guerreiro.email ?? '';
     this.telefone = guerreiro.telefone ?? null;
+    this.ativoPessoa = guerreiro.ativoPessoa;
+    this.enderecosAdicionais = structuredClone(guerreiro.enderecos?.slice(1) || []);
     this.preencherEndereco(guerreiro.enderecos?.[0]);
     this.cdr.detectChanges();
   }
@@ -132,6 +161,8 @@ export class CadastroMilitar {
     this.sexo = guerreiro?.sexo ?? 'N';
     this.email = guerreiro?.email ?? '';
     this.telefone = guerreiro?.telefone ?? null;
+    this.ativoPessoa = guerreiro?.ativoPessoa || 'A';
+    this.enderecosAdicionais = structuredClone(guerreiro?.enderecos?.slice(1) || []);
     this.preencherEndereco(guerreiro?.enderecos?.[0]);
     this.cargo = integrante.cargo ?? '';
     this.dataAdmissao = (integrante.dataAdmissao ?? '').substring(0, 10);
@@ -156,6 +187,7 @@ export class CadastroMilitar {
   limpar(apagarMensagens = true): void {
     this.idEditando = null;
     this.idEndereco = null;
+    this.enderecosAdicionais = [];
     this.nome = '';
     this.cpf = null;
     this.dataNascimento = '';
@@ -172,7 +204,6 @@ export class CadastroMilitar {
       this.mensagem = '';
       this.erro = '';
     }
-1
   }
 
   private preencherEndereco(endereco?: EnderecoModel): void {
@@ -183,10 +214,42 @@ export class CadastroMilitar {
   }
 
   private mostrarErro(erro: any): void {
-    this.erro =
-      erro?.error?.mensagem ??
-      erro?.error?.title ??
-      'Não foi possível comunicar com a API. Confira se o backend está em execução.';
+    this.erro = retornoApi(erro);
+    this.salvando = false;
+    this.carregando = false;
     this.cdr.detectChanges();
+  }
+  consultar(id: number) {
+    this.erro = '';
+    this.carregando = true;
+    if (this.modoIntendencia)
+      this.intendenciaService.consultar(id).subscribe({
+        next: (d) => {
+          this.integrantesIntendencia = [d];
+          this.editarIntendencia(d);
+          this.carregando = false;
+          this.cdr.detectChanges();
+        },
+        error: (e) => {
+          this.integrantesIntendencia = [];
+          this.mostrarErro(e);
+        },
+      });
+    else
+      this.guerreiroService.consultar(id).subscribe({
+        next: (d) => {
+          this.guerreiros = [d];
+          this.editarGuerreiro(d);
+          this.carregando = false;
+          this.cdr.detectChanges();
+        },
+        error: (e) => {
+          this.guerreiros = [];
+          this.mostrarErro(e);
+        },
+      });
+  }
+  adicionarEndereco() {
+    this.enderecosAdicionais.push({ cep: '', numero: '', complemento: '' });
   }
 }

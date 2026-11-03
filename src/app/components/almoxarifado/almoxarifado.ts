@@ -1,3 +1,6 @@
+import { ConsultaId } from '../consulta-id/consulta-id';
+import { Validacao } from '../validacao/validacao';
+import { retornoApi } from '../../services/retorno-api';
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AlmoxarifadoService } from '../../services/almoxarifado.service';
@@ -10,7 +13,7 @@ import {
 
 @Component({
   selector: 'app-almoxarifado',
-  imports: [FormsModule],
+  imports: [FormsModule, ConsultaId, Validacao],
   templateUrl: './almoxarifado.html',
   styleUrl: './almoxarifado.css',
 })
@@ -123,7 +126,6 @@ export class Almoxarifado {
       item: this.item,
       descricaoItem: this.descricaoItem,
       preco: Number(this.preco ?? 0),
-      tipoItem: 'P',
       ativoProdutoServico: this.ativoProdutoServico,
       codigoPreco: Number(this.codigoPreco ?? 0),
       precoVenda: Number(this.precoVenda ?? 0),
@@ -172,6 +174,9 @@ export class Almoxarifado {
       descricaoItem: this.descricaoItem,
       preco: Number(this.preco ?? 0),
       ativoProdutoServico: this.ativoProdutoServico,
+      codigoPreco: 1,
+      precoVenda: 0,
+      unidade: 'UN',
     };
     this.api.salvarServico(dados, this.idEditando ?? undefined).subscribe({
       next: () => {
@@ -225,10 +230,10 @@ export class Almoxarifado {
     });
   }
 
-  excluirEntrada(id: number): void {
-    this.api.excluirEntrada(id).subscribe({
+  estornarEntrada(id: number): void {
+    this.api.estornarEntrada(id).subscribe({
       next: () => {
-        this.mensagem = 'Entrada excluída.';
+        this.mensagem = 'Entrada estornada. O saldo do estoque foi atualizado.';
         this.carregar();
         this.cdr.detectChanges();
       },
@@ -256,14 +261,67 @@ export class Almoxarifado {
       this.mensagem = '';
       this.erro = '';
     }
-    this.cdr.detectChanges();
   }
 
   private mostrarErro(erro: any): void {
-    this.erro =
-      erro?.error?.mensagem ??
-      erro?.error?.title ??
-      'Não foi possível comunicar com a API. Confira se o backend está em execução.';
+    this.erro = retornoApi(erro);
     this.cdr.detectChanges();
+  }
+  consultar(id: number) {
+    this.erro = '';
+    if (this.aba === 'categorias')
+      this.api.consultarCategoria(id).subscribe({
+        next: (d) => {
+          this.categorias = [d];
+          this.cdr.detectChanges();
+        },
+        error: (e) => {
+          this.categorias = [];
+          this.mostrarErro(e);
+        },
+      });
+    if (this.aba === 'produtos')
+      this.api.consultarProduto(id).subscribe({
+        next: (d) => {
+          this.produtos = [d];
+          this.cdr.detectChanges();
+        },
+        error: (e) => {
+          this.produtos = [];
+          this.mostrarErro(e);
+        },
+      });
+    if (this.aba === 'servicos')
+      this.api.consultarServico(id).subscribe({
+        next: (d) => {
+          this.servicos = [d];
+          this.cdr.detectChanges();
+        },
+        error: (e) => {
+          this.servicos = [];
+          this.mostrarErro(e);
+        },
+      });
+    if (this.aba === 'entradas')
+      this.api.consultarEntrada(id).subscribe({
+        next: (d) => {
+          this.entradas = [d];
+          this.cdr.detectChanges();
+        },
+        error: (e) => {
+          this.entradas = [];
+          this.mostrarErro(e);
+        },
+      });
+  }
+  desativarProduto(produto: ProdutoModel) {
+    this.editarProduto(produto);
+    this.ativoProdutoServico = 'I';
+    this.salvarProduto();
+  }
+  desativarServico(servico: ItemCatalogoModel) {
+    this.editarServico(servico);
+    this.ativoProdutoServico = 'I';
+    this.salvarServico();
   }
 }

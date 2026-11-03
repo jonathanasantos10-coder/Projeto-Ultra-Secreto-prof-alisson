@@ -1,0 +1,62 @@
+<main class="pagina">
+  <p class="eyebrow">Loja dos Guerreiros</p>
+  <h1>Carrinho de compras</h1>
+  <a routerLink="/loja">Continuar no catálogo</a>
+  @if (erro()) {
+    <p class="erro" role="alert">{{ erro() }}</p>
+  }
+  <section class="painel">
+    @if (!carrinho.linhas().length) {
+      <p>Seu carrinho está vazio.</p>
+    } @else {
+      <div class="tabela-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Preço unitário</th>
+              <th>Quantidade</th>
+              <th>Subtotal</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (i of carrinho.linhas(); track i.idItem) {
+              <tr>
+                <td>{{ i.item1 }}</td>
+                <td>{{ i.preco | currency: 'BRL' }}</td>
+                <td>
+                  <input
+                    class="quantidade"
+                    type="number"
+                    [attr.aria-label]="'Quantidade de ' + i.item1"
+                    [ngModel]="i.quantidadeItens"
+                    (ngModelChange)="alterar(i.idItem, $event)"
+                    min="1"
+                    step="1"
+                  />
+                </td>
+                <td>{{ i.preco * i.quantidadeItens | currency: 'BRL' }}</td>
+                <td><button class="perigo" (click)="remover(i.idItem)">Remover</button></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="total">Total estimado: {{ carrinho.total() | currency: 'BRL' }}</p>
+      <p>Preços e estoque serão conferidos pela API ao confirmar.</p>
+      @if (identificacao.atual(); as guerreiro) {
+        <p>Pedido para {{ guerreiro.nome }}.</p>
+        <button [disabled]="ocupado() || !!invalidos().length" (click)="confirmar()">
+          Confirmar pedido
+        </button>
+      } @else {
+        <div class="botoes">
+          <a class="botao" routerLink="/identificacao" [queryParams]="{ retorno: '/carrinho' }"
+            >Identificar-me para comprar</a
+          ><a routerLink="/cadastro">Cadastrar Guerreiro</a>
+        </div>
+      }
+    }
+  </section>
+</main>

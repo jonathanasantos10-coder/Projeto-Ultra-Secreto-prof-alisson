@@ -1,0 +1,4 @@
+:host { display: block; }
+.erro { margin: 12px 0; padding: 11px 14px; border: 1px solid #ecc9c3; border-left: 4px solid var(--vermelho); border-radius: 2px; background: var(--vermelho-claro); color: #782b27; font-size: 12px; line-height: 1.55; }
+.erro ul { margin: 7px 0 0; padding-left: 20px; }
+.erro li { margin: 2px 0; }

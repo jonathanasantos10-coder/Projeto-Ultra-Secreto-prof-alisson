@@ -1,0 +1,91 @@
+<main class="pagina">
+  <section class="hero">
+    <p class="eyebrow">Catálogo · Produtos e serviços</p>
+    <h1>Produtos e serviços disponíveis</h1>
+    <p>Consulte os itens disponíveis, filtre por categoria e adicione ao carrinho.</p>
+    <a class="botao" routerLink="/carrinho">Ver carrinho ({{ carrinho.quantidade() }})</a>
+  </section>
+  @if (erro()) {
+    <p class="erro" role="alert">{{ erro() }}</p>
+  }
+  @if (mensagem()) {
+    <p class="aviso" role="status">{{ mensagem() }}</p>
+  }
+  @if (carregando()) {
+    <p role="status">Consultando catálogo…</p>
+  }
+  @if (detalhe(); as i) {
+    <section class="painel">
+      <a routerLink="/loja">Voltar ao catálogo</a>
+      <p class="eyebrow">{{ i.tipoItem === 'P' ? 'Produto' : 'Serviço' }} #{{ i.iditem }}</p>
+      <h2>{{ i.item1 }}</h2>
+      <p>{{ i.descricaoItem }}</p>
+      <p>Categoria: {{ i.idcategoriaNavigation?.categoria }}</p>
+      <p class="preco">{{ i.precoVenda | currency: 'BRL' }}</p>
+      <p>
+        {{
+          i.tipoItem === 'P' ? i.quantidadeEstoque + ' unidades disponíveis' : 'Serviço disponível'
+        }}
+      </p>
+      <button (click)="adicionar(i)" [disabled]="i.tipoItem === 'P' && !i.quantidadeEstoque">
+        Adicionar ao carrinho
+      </button>
+    </section>
+  } @else if (!carregando()) {
+    <nav class="categorias" aria-label="Categorias">
+      <a routerLink="/loja">Todas as categorias</a>
+      @for (c of categorias(); track c.idcategoria) {
+        <a routerLink="/loja" [queryParams]="{ idcategoria: c.idcategoria }">{{ c.categoria }}</a>
+      }
+    </nav>
+    <form class="painel filtros" (ngSubmit)="pesquisar()">
+      <div class="campo">
+        <label for="nomeLoja">Pesquisar por nome</label
+        ><input id="nomeLoja" name="nome" [(ngModel)]="nome" />
+      </div>
+      <div class="campo">
+        <label for="categoriaLoja">Categoria</label
+        ><select id="categoriaLoja" name="categoria" [(ngModel)]="idcategoria">
+          <option [ngValue]="null">Todas</option>
+          @for (c of categorias(); track c.idcategoria) {
+            <option [ngValue]="c.idcategoria">{{ c.categoria }}</option>
+          }
+        </select>
+      </div>
+      <div class="campo">
+        <label for="tipoLoja">Tipo</label
+        ><select id="tipoLoja" name="tipo" [(ngModel)]="tipo">
+          <option value="">Produtos e serviços</option>
+          <option value="P">Produtos</option>
+          <option value="S">Serviços</option>
+        </select>
+      </div>
+      <button>Pesquisar</button><a routerLink="/loja">Limpar</a>
+    </form>
+    <div class="grade-catalogo">
+      @for (i of itens(); track i.iditem) {
+        <article class="painel cartao-item">
+          <div class="simbolo">{{ i.tipoItem }}</div>
+          <p class="eyebrow">{{ i.idcategoriaNavigation?.categoria }}</p>
+          <h2>
+            <a [routerLink]="['/loja/item', i.iditem]">{{ i.item1 }}</a>
+          </h2>
+          <p>{{ i.descricaoItem }}</p>
+          <p class="preco">{{ i.precoVenda | currency: 'BRL' }}</p>
+          <p>
+            {{
+              i.tipoItem === 'P'
+                ? i.quantidadeEstoque + ' unidades disponíveis'
+                : 'Serviço disponível'
+            }}
+          </p>
+          <button (click)="adicionar(i)" [disabled]="i.tipoItem === 'P' && !i.quantidadeEstoque">
+            Adicionar ao carrinho
+          </button>
+        </article>
+      } @empty {
+        <p>Nenhum produto ou serviço encontrado.</p>
+      }
+    </div>
+  }
+</main>

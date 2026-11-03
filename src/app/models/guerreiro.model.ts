@@ -11,7 +11,7 @@ export interface GuerreiroPayload {
   dataNascimento: string;
   sexo: string;
   email: string;
-  telefone: number | null;
+  telefone: number;
   ativoPessoa: string;
   enderecos: EnderecoModel[];
 }

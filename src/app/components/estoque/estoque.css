@@ -1,0 +1,17 @@
+:host { display: block; }
+.pagina { width: min(1300px, calc(100% - 32px)); margin: 28px auto 54px; color: var(--texto); }
+.eyebrow { margin: 0 0 7px; color: var(--oliva-700); font-size: 11px; font-weight: 850; letter-spacing: 1.7px; text-transform: uppercase; }
+h1 { margin: 0 0 20px; color: var(--oliva-900); font-size: clamp(26px, 4vw, 35px); }
+.painel { border: 1px solid var(--borda); border-top: 4px solid var(--oliva-700); border-radius: 3px; background: var(--areia-50); box-shadow: var(--sombra); }
+.tabela-wrap { overflow-x: auto; margin-top: 18px; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th, td { padding: 11px 9px; border-bottom: 1px solid #e3e0d3; text-align: left; vertical-align: middle; }
+th { background: var(--oliva-900); color: #f4f0e2; font-size: 10px; font-weight: 850; letter-spacing: .7px; text-transform: uppercase; white-space: nowrap; }
+tbody tr:nth-child(even) { background: #f2f0e6; }
+tbody tr:hover { background: #e8ebdf; }
+tbody tr:last-child td { border-bottom: 0; }
+.erro { margin: 14px 0; padding: 11px 14px; border-left: 4px solid var(--vermelho); border-radius: 2px; background: var(--vermelho-claro); color: #782b27; font-size: 13px; }
+@media (max-width: 700px) {
+  .pagina { width: calc(100% - 20px); margin: 18px auto 35px; }
+  th, td { padding: 9px 8px; }
+}

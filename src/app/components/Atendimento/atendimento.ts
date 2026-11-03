@@ -1,3 +1,7 @@
+import { ConsultaId } from '../consulta-id/consulta-id';
+import { Validacao } from '../validacao/validacao';
+import { DetalhesAtendimento, nomeSituacao } from '../detalhes-atendimento/detalhes-atendimento';
+import { retornoApi } from '../../services/retorno-api';
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { GuerreiroService } from '../../services/guerreiro.service';
@@ -6,7 +10,12 @@ import { AlmoxarifadoService } from '../../services/almoxarifado.service';
 import { AtendimentoService } from '../../services/atendimento.service';
 import { GuerreiroModel } from '../../models/guerreiro.model';
 import { IntendenciaModel } from '../../models/intendencia.model';
-import { AtendimentoItemModel, AtendimentoModel, AtendimentoPayload, ItemAtendimentoPayload } from '../../models/atendimento.model';
+import {
+  AtendimentoItemModel,
+  AtendimentoModel,
+  AtendimentoPayload,
+  ItemAtendimentoPayload,
+} from '../../models/atendimento.model';
 import { ItemCatalogoModel, ItemOpcao, ProdutoModel } from '../../models/almoxarifado.model';
 
 interface LinhaAtendimento {
@@ -18,11 +27,14 @@ interface LinhaAtendimento {
 
 @Component({
   selector: 'app-atendimento',
-  imports: [FormsModule],
+  imports: [FormsModule, ConsultaId, Validacao, DetalhesAtendimento],
   templateUrl: './atendimento.html',
-  styleUrl: './atendimento.css'
+  styleUrl: './atendimento.css',
 })
 export class Atendimento {
+  filtroStatus = '';
+  detalhe: AtendimentoModel | null = null;
+  nomeSituacao = nomeSituacao;
   guerreiros: GuerreiroModel[] = [];
   integrantesIntendencia: IntendenciaModel[] = [];
   opcoesItens: ItemOpcao[] = [];
@@ -40,43 +52,52 @@ export class Atendimento {
     private guerreiroService: GuerreiroService,
     private intendenciaService: IntendenciaService,
     private almoxarifado: AlmoxarifadoService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
     this.carregar();
   }
 
   carregar(): void {
-    this.atendimentoService.listar().subscribe({
-      next: dados => { this.atendimentos = dados; this.cdr.detectChanges(); },
-      error: erro => this.mostrarErro(erro)
+    this.atendimentoService.listar(this.filtroStatus).subscribe({
+      next: (dados) => {
+        this.atendimentos = dados;
+        this.cdr.detectChanges();
+      },
+      error: (erro) => this.mostrarErro(erro),
     });
     this.guerreiroService.listar().subscribe({
-      next: dados => { this.guerreiros = dados; this.cdr.detectChanges(); },
-      error: erro => this.mostrarErro(erro)
+      next: (dados) => {
+        this.guerreiros = dados;
+        this.cdr.detectChanges();
+      },
+      error: (erro) => this.mostrarErro(erro),
     });
     this.intendenciaService.listar().subscribe({
-      next: dados => { this.integrantesIntendencia = dados; this.cdr.detectChanges(); },
-      error: erro => this.mostrarErro(erro)
+      next: (dados) => {
+        this.integrantesIntendencia = dados;
+        this.cdr.detectChanges();
+      },
+      error: (erro) => this.mostrarErro(erro),
     });
     this.almoxarifado.listarProdutos().subscribe({
-      next: dados => {
+      next: (dados) => {
         this.opcoesItens = [
-          ...this.opcoesItens.filter(item => item.tipo !== 'P'),
-          ...dados.map(produto => this.produtoOpcao(produto))
+          ...this.opcoesItens.filter((item) => item.tipo !== 'P'),
+          ...dados.map((produto) => this.produtoOpcao(produto)),
         ];
         this.cdr.detectChanges();
       },
-      error: erro => this.mostrarErro(erro)
+      error: (erro) => this.mostrarErro(erro),
     });
     this.almoxarifado.listarServicos().subscribe({
-      next: dados => {
+      next: (dados) => {
         this.opcoesItens = [
-          ...this.opcoesItens.filter(item => item.tipo !== 'S'),
-          ...dados.map(servico => this.servicoOpcao(servico))
+          ...this.opcoesItens.filter((item) => item.tipo !== 'S'),
+          ...dados.map((servico) => this.servicoOpcao(servico)),
         ];
         this.cdr.detectChanges();
       },
-      error: erro => this.mostrarErro(erro)
+      error: (erro) => this.mostrarErro(erro),
     });
   }
 
@@ -84,23 +105,32 @@ export class Atendimento {
     return { idItem: null, idFuncionario: null, quantidadeItens: 1, valorUnitarioEntrada: 0 };
   }
 
-  adicionarLinha(): void { this.linhas.push(this.novaLinha()); }
-  removerLinha(indice: number): void { this.linhas.splice(indice, 1); }
+  adicionarLinha(): void {
+    this.linhas.push(this.novaLinha());
+  }
+
+  atualizarValor(linha: LinhaAtendimento, idItem: number | null): void {
+    const opcao = this.opcoesItens.find((item) => item.iditem === Number(idItem));
+    linha.valorUnitarioEntrada = opcao?.preco ?? 0;
+  }
+  removerLinha(indice: number): void {
+    this.linhas.splice(indice, 1);
+  }
 
   salvar(): void {
     this.mensagem = '';
     this.erro = '';
-    const itens: ItemAtendimentoPayload[] = this.linhas.map(linha => ({
+    const itens: ItemAtendimentoPayload[] = this.linhas.map((linha) => ({
       idItem: Number(linha.idItem ?? 0),
       idFuncionario: Number(linha.idFuncionario ?? 0),
       quantidadeItens: Number(linha.quantidadeItens),
-      valorUnitarioEntrada: Number(linha.valorUnitarioEntrada)
+      valorUnitarioEntrada: Number(linha.valorUnitarioEntrada),
     }));
     const dados: AtendimentoPayload = {
       idPessoa: Number(this.idGuerreiro ?? 0),
       dataAtendimento: this.dataAtendimento,
       statusAtendimento: this.statusAtendimento,
-      itens
+      itens,
     };
 
     this.atendimentoService.salvar(dados, this.idEditando ?? undefined).subscribe({
@@ -110,7 +140,7 @@ export class Atendimento {
         this.carregar();
         this.cdr.detectChanges();
       },
-      error: erro => this.mostrarErro(erro)
+      error: (erro) => this.mostrarErro(erro),
     });
   }
 
@@ -123,7 +153,7 @@ export class Atendimento {
       idItem: item.idItem,
       idFuncionario: item.idFuncionario,
       quantidadeItens: item.quantidadeItens,
-      valorUnitarioEntrada: item.valorUnitarioEntrada
+      valorUnitarioEntrada: item.valorUnitarioEntrada,
     }));
     if (!this.linhas.length) this.linhas = [this.novaLinha()];
     this.cdr.detectChanges();
@@ -131,8 +161,12 @@ export class Atendimento {
 
   excluir(id: number): void {
     this.atendimentoService.excluir(id).subscribe({
-      next: () => { this.mensagem = 'Atendimento excluído.'; this.carregar(); this.cdr.detectChanges(); },
-      error: erro => this.mostrarErro(erro)
+      next: () => {
+        this.mensagem = 'Atendimento excluído.';
+        this.carregar();
+        this.cdr.detectChanges();
+      },
+      error: (erro) => this.mostrarErro(erro),
     });
   }
 
@@ -142,8 +176,10 @@ export class Atendimento {
     this.dataAtendimento = '';
     this.statusAtendimento = 'A';
     this.linhas = [this.novaLinha()];
-    if (apagarMensagens) { this.mensagem = ''; this.erro = ''; }
-    this.cdr.detectChanges();
+    if (apagarMensagens) {
+      this.mensagem = '';
+      this.erro = '';
+    }
   }
 
   private produtoOpcao(produto: ProdutoModel): ItemOpcao {
@@ -152,16 +188,42 @@ export class Atendimento {
       iditem: produto.iditem,
       descricao: item?.item1 ?? `Produto ${produto.iditem}`,
       tipo: 'P',
-      preco: Number(item?.preco ?? produto.precoVenda ?? 0)
+      preco: Number(produto.precoVenda ?? item?.preco ?? 0),
     };
   }
 
   private servicoOpcao(servico: ItemCatalogoModel): ItemOpcao {
-    return { iditem: servico.iditem, descricao: servico.item1, tipo: 'S', preco: Number(servico.preco ?? 0) };
+    return {
+      iditem: servico.iditem,
+      descricao: servico.item1,
+      tipo: 'S',
+      preco: Number(servico.preco ?? 0),
+    };
   }
 
   private mostrarErro(erro: any): void {
-    this.erro = erro?.error?.mensagem ?? erro?.error?.title ?? 'Não foi possível comunicar com a API. Confira se o backend está em execução.';
+    this.erro = retornoApi(erro);
     this.cdr.detectChanges();
+  }
+  consultar(id: number) {
+    this.erro = '';
+    this.detalhe = null;
+    this.atendimentoService.consultar(id).subscribe({
+      next: (d) => {
+        this.detalhe = d;
+        this.cdr.detectChanges();
+      },
+      error: (e) => this.mostrarErro(e),
+    });
+  }
+  mudarSituacao(atendimento: AtendimentoModel, status: string) {
+    this.atendimentoService.alterarSituacao(atendimento.idAtendimento, status).subscribe({
+      next: () => {
+        this.mensagem = 'Situação atualizada.';
+        this.detalhe = null;
+        this.carregar();
+      },
+      error: (e) => this.mostrarErro(e),
+    });
   }
 }

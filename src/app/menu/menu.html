@@ -1,12 +1,39 @@
 <header id="cabecalho">
-  <a id="logo" routerLink="/home" aria-label="Intranet da Intendência - Início">
-    <img src="/imgs/logo.jpeg" alt="Logo da Intranet da Intendência">
-  </a>
-  <nav id="menu">
-    <a routerLink="/home">Início</a>
-    <a routerLink="/guerreiros">Guerreiros</a>
-    <a routerLink="/intendencia">Intendência</a>
-    <a routerLink="/almoxarifado">Almoxarifado</a>
-    <a routerLink="/atendimentos">Atendimentos</a>
+  <a id="logo" routerLink="/loja" aria-label="Loja da Intendência"
+    ><img src="/imgs/logo.jpeg" alt="Logo da Intendência"
+  /></a>
+  <nav id="menu" aria-label="Módulos">
+    <a routerLink="/loja">Loja dos Guerreiros</a>
+    @if (identificacao.atual()?.intendencia) {
+      <a routerLink="/home">Painel da Intendência</a>
+    } @else {
+      <a routerLink="/identificacao" [queryParams]="{ retorno: '/home' }">Acesso à Intendência</a>
+    }
+    @if (identificacao.atual(); as g) {
+      <span>{{ g.nome }}</span
+      ><button class="secundario" (click)="sair()">Sair</button>
+    } @else {
+      <a routerLink="/identificacao">Identificar-me</a>
+    }
   </nav>
 </header>
+@if (erro()) {
+  <p class="erro" role="alert">{{ erro() }}</p>
+}
+<nav class="subnav" aria-label="Navegação">
+  @if (administrativo() && identificacao.atual()?.intendencia) {
+    <a routerLink="/home" routerLinkActive="ativo" [routerLinkActiveOptions]="{ exact: true }">Início</a
+    ><a routerLink="/guerreiros" routerLinkActive="ativo" [routerLinkActiveOptions]="{ exact: true }">Guerreiros</a
+    ><a routerLink="/intendencia" routerLinkActive="ativo" [routerLinkActiveOptions]="{ exact: true }">Intendência</a
+    ><a routerLink="/almoxarifado" routerLinkActive="ativo" [routerLinkActiveOptions]="{ exact: true }">Almoxarifado</a
+    ><a routerLink="/estoque" routerLinkActive="ativo" [routerLinkActiveOptions]="{ exact: true }">Estoque</a
+    ><a routerLink="/atendimentos" routerLinkActive="ativo" [routerLinkActiveOptions]="{ exact: true }">Atendimentos</a>
+  } @else {
+    <a routerLink="/loja" routerLinkActive="ativo" [routerLinkActiveOptions]="{ exact: true }">Catálogo</a
+    ><a routerLink="/loja" [queryParams]="{ tipo: 'P' }" routerLinkActive="ativo" [routerLinkActiveOptions]="{ exact: true }">Produtos</a
+    ><a routerLink="/loja" [queryParams]="{ tipo: 'S' }" routerLinkActive="ativo" [routerLinkActiveOptions]="{ exact: true }">Serviços</a
+    ><a routerLink="/carrinho" routerLinkActive="ativo" [routerLinkActiveOptions]="{ exact: true }">Carrinho ({{ carrinho.quantidade() }})</a
+    ><a routerLink="/meus-atendimentos" routerLinkActive="ativo" [routerLinkActiveOptions]="{ exact: true }">Meus pedidos</a
+    ><a routerLink="/cadastro" routerLinkActive="ativo" [routerLinkActiveOptions]="{ exact: true }">Cadastrar Guerreiro</a>
+  }
+</nav>

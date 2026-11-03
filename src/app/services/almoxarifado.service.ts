@@ -1,37 +1,121 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { CategoriaModel, EntradaProdutoModel, ItemCatalogoModel, ProdutoModel } from '../models/almoxarifado.model';
+import {
+  CategoriaModel,
+  CategoriaPayload,
+  EntradaProdutoModel,
+  EntradaProdutoPayload,
+  EstoqueModel,
+  ItemCatalogoModel,
+  ItemCatalogoPayload,
+  ProdutoModel,
+} from '../models/almoxarifado.model';
 import { API_URL } from './api-config';
 
 @Injectable({ providedIn: 'root' })
 export class AlmoxarifadoService {
+  // O backend usa [Route("api")], portanto estes segmentos são diretos em /api.
   private readonly categoriasUrl = `${API_URL}/Categorium`;
+  private readonly catalogoUrl = `${API_URL}/Catalogo`;
   private readonly produtosUrl = `${API_URL}/ProdutoItem`;
   private readonly servicosUrl = `${API_URL}/Itens`;
+  private readonly estoqueUrl = `${API_URL}/Estoque`;
   private readonly entradasUrl = `${API_URL}/EntradaProduto`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
-  listarCategorias(): Observable<CategoriaModel[]> { return this.http.get<CategoriaModel[]>(this.categoriasUrl); }
-  salvarCategoria(categoria: Partial<CategoriaModel>, id?: number): Observable<unknown> {
-    return id ? this.http.put(`${this.categoriasUrl}/${id}`, { ...categoria, idcategoria: id }) : this.http.post(this.categoriasUrl, categoria);
+  listarCategorias(): Observable<CategoriaModel[]> {
+    return this.http.get<CategoriaModel[]>(this.categoriasUrl);
   }
-  excluirCategoria(id: number): Observable<unknown> { return this.http.delete(`${this.categoriasUrl}/${id}`); }
 
-  listarProdutos(): Observable<ProdutoModel[]> { return this.http.get<ProdutoModel[]>(this.produtosUrl); }
-  salvarProduto(dados: unknown, id?: number): Observable<unknown> {
-    return id ? this.http.put(`${this.produtosUrl}/${id}`, dados) : this.http.post(this.produtosUrl, dados);
+  consultarCategoria(id: number): Observable<CategoriaModel> {
+    return this.http.get<CategoriaModel>(`${this.categoriasUrl}/${id}`);
   }
-  excluirProduto(id: number): Observable<unknown> { return this.http.delete(`${this.produtosUrl}/${id}`); }
 
-  listarServicos(): Observable<ItemCatalogoModel[]> { return this.http.get<ItemCatalogoModel[]>(this.servicosUrl); }
-  salvarServico(dados: unknown, id?: number): Observable<unknown> {
-    return id ? this.http.put(`${this.servicosUrl}/${id}`, dados) : this.http.post(this.servicosUrl, dados);
+  salvarCategoria(dados: CategoriaPayload, id?: number): Observable<unknown> {
+    return id == null
+      ? this.http.post(this.categoriasUrl, dados)
+      : this.http.put(`${this.categoriasUrl}/${id}`, dados);
   }
-  excluirServico(id: number): Observable<unknown> { return this.http.delete(`${this.servicosUrl}/${id}`); }
 
-  listarEntradas(): Observable<EntradaProdutoModel[]> { return this.http.get<EntradaProdutoModel[]>(this.entradasUrl); }
-  salvarEntrada(dados: unknown): Observable<unknown> { return this.http.post(this.entradasUrl, dados); }
-  excluirEntrada(id: number): Observable<unknown> { return this.http.delete(`${this.entradasUrl}/${id}`); }
+  excluirCategoria(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.categoriasUrl}/${id}`);
+  }
+
+  listarProdutos(): Observable<ProdutoModel[]> {
+    return this.http.get<ProdutoModel[]>(this.produtosUrl);
+  }
+
+  consultarProduto(id: number): Observable<ProdutoModel> {
+    return this.http.get<ProdutoModel>(`${this.produtosUrl}/${id}`);
+  }
+
+  salvarProduto(dados: ItemCatalogoPayload, id?: number): Observable<unknown> {
+    return id == null
+      ? this.http.post(this.produtosUrl, dados)
+      : this.http.put(`${this.produtosUrl}/${id}`, dados);
+  }
+
+  excluirProduto(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.produtosUrl}/${id}`);
+  }
+
+  listarServicos(): Observable<ItemCatalogoModel[]> {
+    return this.http.get<ItemCatalogoModel[]>(this.servicosUrl);
+  }
+
+  consultarServico(id: number): Observable<ItemCatalogoModel> {
+    return this.http.get<ItemCatalogoModel>(`${this.servicosUrl}/${id}`);
+  }
+
+  salvarServico(dados: ItemCatalogoPayload, id?: number): Observable<unknown> {
+    return id == null
+      ? this.http.post(this.servicosUrl, dados)
+      : this.http.put(`${this.servicosUrl}/${id}`, dados);
+  }
+
+  excluirServico(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.servicosUrl}/${id}`);
+  }
+
+  listarEntradas(): Observable<EntradaProdutoModel[]> {
+    return this.http.get<EntradaProdutoModel[]>(this.entradasUrl);
+  }
+
+  consultarEntrada(id: number): Observable<EntradaProdutoModel> {
+    return this.http.get<EntradaProdutoModel>(`${this.entradasUrl}/${id}`);
+  }
+
+  salvarEntrada(dados: EntradaProdutoPayload): Observable<{ identradaProduto: number }> {
+    return this.http.post<{ identradaProduto: number }>(this.entradasUrl, dados);
+  }
+
+  estornarEntrada(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.entradasUrl}/${id}`);
+  }
+
+  listarCatalogo(
+    nome = '',
+    idcategoria: number | null = null,
+    tipo: string = '',
+  ): Observable<ItemCatalogoModel[]> {
+    let params = new HttpParams();
+    if (nome.trim()) params = params.set('nome', nome.trim());
+    if (idcategoria != null) params = params.set('idcategoria', idcategoria);
+    if (tipo) params = params.set('tipo', tipo);
+    return this.http.get<ItemCatalogoModel[]>(this.catalogoUrl, { params });
+  }
+
+  consultarCatalogo(id: number): Observable<ItemCatalogoModel> {
+    return this.http.get<ItemCatalogoModel>(`${this.catalogoUrl}/${id}`);
+  }
+
+  listarEstoque(): Observable<EstoqueModel[]> {
+    return this.http.get<EstoqueModel[]>(this.estoqueUrl);
+  }
+
+  consultarEstoque(id: number): Observable<EstoqueModel> {
+    return this.http.get<EstoqueModel>(`${this.estoqueUrl}/${id}`);
+  }
 }
