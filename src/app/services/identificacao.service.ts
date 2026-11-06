@@ -11,7 +11,7 @@ export interface IdentificacaoModel {
 
 export interface IdentificacaoPayload {
   cpf: number;
-  dataNascimento: string;
+  senha: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -26,9 +26,9 @@ export class IdentificacaoService {
     return this.http.get<IdentificacaoModel>(this.url).pipe(tap((dados) => this.atual.set(dados)));
   }
 
-  /** POST /api/Identificacao — autenticação por CPF e data de nascimento. */
-  entrar(cpf: number, dataNascimento: string): Observable<IdentificacaoModel> {
-    const dados: IdentificacaoPayload = { cpf, dataNascimento };
+  /** POST /api/Identificacao — autenticação por CPF e senha. */
+  entrar(cpf: number, senha: string): Observable<IdentificacaoModel> {
+    const dados: IdentificacaoPayload = { cpf, senha };
     return this.http.post<IdentificacaoModel>(this.url, dados).pipe(tap((d) => this.atual.set(d)));
   }
 
