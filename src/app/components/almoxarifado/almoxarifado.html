@@ -147,6 +147,16 @@
             <option value="I">Inativo</option>
           </select>
         </div>
+        <div class="campo">
+          <label for="imagemProduto">Foto do produto (JPG, PNG ou WEBP — até 5 MB)</label>
+          <input id="imagemProduto" name="imagemProduto" type="file" accept="image/jpeg,image/png,image/webp" (change)="selecionarImagem($event)" />
+          @if (temImagemProduto) {
+            <small>Este produto já possui uma foto. Selecione outra para substituí-la.</small>
+          }
+          @if (arquivoImagem) {
+            <small>Arquivo selecionado: {{ arquivoImagem.name }}</small>
+          }
+        </div>
         <div class="botoes">
           <button type="submit">{{ idEditando ? 'Salvar alterações' : 'Cadastrar produto' }}</button
           ><button type="button" class="secundario" (click)="limpar()">Limpar</button>
@@ -158,6 +168,7 @@
           <thead>
             <tr>
               <th>ID</th>
+              <th>Foto</th>
               <th>Produto</th>
               <th>Categoria</th>
               <th>Preço venda</th>
@@ -169,6 +180,11 @@
             @for (p of produtos; track p.iditem) {
               <tr>
                 <td>{{ p.iditem }}</td>
+                <td>
+                  @if (p.iditemNavigation?.temImagem) {
+                    <img class="miniatura-produto" [src]="api.imagemUrl(p.iditem)" [alt]="'Foto de ' + p.iditemNavigation?.item1" />
+                  } @else { — }
+                </td>
                 <td>{{ p.iditemNavigation?.item1 }}</td>
                 <td>{{ p.iditemNavigation?.idcategoriaNavigation?.categoria }}</td>
                 <td>R$ {{ p.precoVenda }}</td>
