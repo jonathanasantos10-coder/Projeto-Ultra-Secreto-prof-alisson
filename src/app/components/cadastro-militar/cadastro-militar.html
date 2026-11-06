@@ -46,6 +46,37 @@
           </select>
         </div>
       </div>
+      @if (idEditando === null) {
+        <h3>Credenciais de acesso</h3>
+        <div class="linha">
+          <div class="campo">
+            <label for="senha">Senha</label
+            ><input
+              id="senha"
+              name="senha"
+              type="password"
+              [(ngModel)]="senha"
+              required
+              minlength="8"
+              maxlength="100"
+              autocomplete="new-password"
+            />
+          </div>
+          <div class="campo">
+            <label for="confirmarSenha">Confirmar senha</label
+            ><input
+              id="confirmarSenha"
+              name="confirmarSenha"
+              type="password"
+              [(ngModel)]="confirmarSenha"
+              required
+              minlength="8"
+              maxlength="100"
+              autocomplete="new-password"
+            />
+          </div>
+        </div>
+      }
       <div class="linha">
         <div class="campo">
           <label for="email">E-mail</label
