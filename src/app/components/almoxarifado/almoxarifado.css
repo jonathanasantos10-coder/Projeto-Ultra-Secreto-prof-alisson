@@ -223,3 +223,12 @@ tbody tr:last-child td {
     padding: 10px 8px;
   }
 }
+
+
+.miniatura-produto {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  border: 1px solid var(--borda);
+  background: #fffef9;
+}
