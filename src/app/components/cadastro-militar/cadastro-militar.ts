@@ -41,6 +41,8 @@ export class CadastroMilitar {
   complemento = '';
   cargo = '';
   dataAdmissao = '';
+  senha = '';
+  confirmarSenha = '';
 
   constructor(
     private guerreiroService: GuerreiroService,
@@ -88,6 +90,18 @@ export class CadastroMilitar {
     this.salvando = true;
     this.mensagem = '';
     this.erro = '';
+    if (this.idEditando === null) {
+      if (this.senha.length < 8 || this.senha.length > 100) {
+        this.erro = 'A senha deve conter entre 8 e 100 caracteres.';
+        this.salvando = false;
+        return;
+      }
+      if (this.senha !== this.confirmarSenha) {
+        this.erro = 'A confirmação da senha não corresponde.';
+        this.salvando = false;
+        return;
+      }
+    }
     const endereco: EnderecoModel = {
       idendereco: this.idEndereco ?? 0,
       cep: this.cep,
@@ -104,6 +118,7 @@ export class CadastroMilitar {
       telefone: Number(this.telefone ?? 0),
       ativoPessoa: this.ativoPessoa,
       enderecos: [endereco, ...this.enderecosAdicionais],
+      ...(this.idEditando === null ? { senha: this.senha } : {}),
     };
 
     const requisicao = this.modoIntendencia
@@ -122,7 +137,7 @@ export class CadastroMilitar {
         this.salvando = false;
         if (this.publico) {
           this.identificacao
-            .entrar(guerreiro.cpf, guerreiro.dataNascimento)
+            .entrar(guerreiro.cpf, this.senha)
             .subscribe({
               next: () => this.router.navigate(['/carrinho']),
               error: (e) => this.mostrarErro(e),
@@ -200,6 +215,8 @@ export class CadastroMilitar {
     this.complemento = '';
     this.cargo = '';
     this.dataAdmissao = '';
+    this.senha = '';
+    this.confirmarSenha = '';
     if (apagarMensagens) {
       this.mensagem = '';
       this.erro = '';
