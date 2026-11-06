@@ -22,6 +22,7 @@ export class AlmoxarifadoService {
   private readonly servicosUrl = `${API_URL}/Itens`;
   private readonly estoqueUrl = `${API_URL}/Estoque`;
   private readonly entradasUrl = `${API_URL}/EntradaProduto`;
+  private readonly imagensUrl = `${API_URL}/ItemImagem`;
 
   constructor(private readonly http: HttpClient) {}
 
@@ -59,6 +60,18 @@ export class AlmoxarifadoService {
 
   excluirProduto(id: number): Observable<void> {
     return this.http.delete<void>(`${this.produtosUrl}/${id}`);
+  }
+
+  imagemUrl(iditem: number): string {
+    return `${this.imagensUrl}/${iditem}`;
+  }
+
+  salvarImagem(iditem: number, arquivo: File, descricao: string, possuiImagem: boolean): Observable<void> {
+    const dados = new FormData();
+    dados.append('Descricao', descricao || 'Imagem do produto');
+    dados.append('Arquivo', arquivo, arquivo.name);
+    const url = `${this.imagensUrl}/${iditem}`;
+    return possuiImagem ? this.http.put<void>(url, dados) : this.http.post<void>(url, dados);
   }
 
   listarServicos(): Observable<ItemCatalogoModel[]> {
