@@ -14,6 +14,7 @@ export interface GuerreiroPayload {
   telefone: number;
   ativoPessoa: string;
   enderecos: EnderecoModel[];
+  senha?: string;
 }
 
 export interface GuerreiroModel extends GuerreiroPayload {
