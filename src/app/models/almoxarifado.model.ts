@@ -18,6 +18,7 @@ export interface ItemCatalogoModel {
   preco: number;
   tipoItem: TipoItem;
   ativoProdutoServico: string;
+  temImagem?: boolean;
   idcategoriaNavigation?: CategoriaModel | null;
   precoVenda?: number | null;
   unidade?: string | null;
