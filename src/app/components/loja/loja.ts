@@ -82,6 +82,10 @@ export class Loja {
       },
     });
   }
+  imagemUrl(iditem: number): string {
+    return this.api.imagemUrl(iditem);
+  }
+
   adicionar(item: ItemCatalogoModel) {
     const erro = this.carrinho.adicionar(item);
     this.erro.set(erro);
