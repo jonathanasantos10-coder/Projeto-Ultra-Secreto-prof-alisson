@@ -13,7 +13,7 @@ import { Validacao } from '../validacao/validacao';
       <p class="eyebrow">Acesso ao sistema</p>
       <h1>Identificação</h1>
       <p>
-        Informe o CPF e o nascimento do cadastro. Integrantes da Intendência têm acesso
+        Informe seu CPF e sua senha de acesso. Integrantes da Intendência têm acesso
         administrativo.
       </p>
       @if (erro()) {
@@ -33,13 +33,16 @@ import { Validacao } from '../validacao/validacao';
           />
         </div>
         <div class="campo">
-          <label for="nascimento">Data de nascimento</label
+          <label for="senha">Senha</label
           ><input
-            id="nascimento"
-            name="Nascimento"
-            type="date"
-            [(ngModel)]="dataNascimento"
+            id="senha"
+            name="senha"
+            type="password"
+            [(ngModel)]="senha"
             required
+            minlength="8"
+            maxlength="100"
+            autocomplete="current-password"
           />
         </div>
         <app-validacao [form]="form" />
@@ -54,7 +57,7 @@ import { Validacao } from '../validacao/validacao';
 })
 export class Identificacao {
   cpf: number | null = null;
-  dataNascimento = '';
+  senha = '';
   erro = signal('');
   ocupado = signal(false);
   constructor(
@@ -65,7 +68,7 @@ export class Identificacao {
   entrar() {
     this.ocupado.set(true);
     this.erro.set('');
-    this.api.entrar(Number(this.cpf), this.dataNascimento).subscribe({
+    this.api.entrar(Number(this.cpf), this.senha).subscribe({
       next: (d) => {
         this.ocupado.set(false);
         const retorno =
