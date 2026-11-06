@@ -138,6 +138,7 @@ export class Almoxarifado {
     this.api.salvarProduto(dados, idEmEdicao ?? undefined).subscribe({
       next: (resposta: any) => {
         const idProduto = idEmEdicao ?? Number(resposta?.iditem ?? 0);
+        if (idProduto > 0) this.idEditando = idProduto;
         const concluir = () => {
           this.mensagem = 'Produto salvo.';
           this.limpar(false);
