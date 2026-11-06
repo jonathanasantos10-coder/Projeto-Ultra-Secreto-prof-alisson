@@ -36,6 +36,9 @@ export class Almoxarifado {
   codigoPreco: number | null = 1;
   precoVenda: number | null = 0;
   unidade = 'UN';
+  arquivoImagem: File | null = null;
+  descricaoImagem = 'Imagem do produto';
+  temImagemProduto = false;
 
   idItemEntrada: number | null = null;
   dataEntradaProduto = '';
@@ -121,6 +124,7 @@ export class Almoxarifado {
   }
 
   salvarProduto(): void {
+    const idEmEdicao = this.idEditando;
     const dados = {
       idCategoria: Number(this.idCategoria ?? 0),
       item: this.item,
@@ -131,15 +135,37 @@ export class Almoxarifado {
       precoVenda: Number(this.precoVenda ?? 0),
       unidade: this.unidade,
     };
-    this.api.salvarProduto(dados, this.idEditando ?? undefined).subscribe({
-      next: () => {
-        this.mensagem = 'Produto salvo.';
-        this.limpar(false);
-        this.carregar();
-        this.cdr.detectChanges();
+    this.api.salvarProduto(dados, idEmEdicao ?? undefined).subscribe({
+      next: (resposta: any) => {
+        const idProduto = idEmEdicao ?? Number(resposta?.iditem ?? 0);
+        const concluir = () => {
+          this.mensagem = 'Produto salvo.';
+          this.limpar(false);
+          this.carregar();
+          this.cdr.detectChanges();
+        };
+
+        if (this.arquivoImagem && idProduto > 0) {
+          this.api.salvarImagem(
+            idProduto,
+            this.arquivoImagem,
+            this.descricaoImagem,
+            this.temImagemProduto,
+          ).subscribe({
+            next: concluir,
+            error: (erro) => this.mostrarErro(erro),
+          });
+        } else {
+          concluir();
+        }
       },
       error: (erro) => this.mostrarErro(erro),
     });
+  }
+
+  selecionarImagem(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.arquivoImagem = input.files?.[0] ?? null;
   }
 
   editarProduto(produto: ProdutoModel): void {
@@ -153,6 +179,8 @@ export class Almoxarifado {
     this.codigoPreco = produto.codigoPreco ?? 0;
     this.precoVenda = Number(produto.precoVenda ?? 0);
     this.unidade = produto.unidade ?? 'UN';
+    this.temImagemProduto = produto.iditemNavigation?.temImagem ?? false;
+    this.arquivoImagem = null;
     this.cdr.detectChanges();
   }
 
@@ -252,6 +280,9 @@ export class Almoxarifado {
     this.codigoPreco = 1;
     this.precoVenda = 0;
     this.unidade = 'UN';
+    this.arquivoImagem = null;
+    this.descricaoImagem = 'Imagem do produto';
+    this.temImagemProduto = false;
     this.idItemEntrada = null;
     this.dataEntradaProduto = '';
     this.quantidadeEntrada = 1;
