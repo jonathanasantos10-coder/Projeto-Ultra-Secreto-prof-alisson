@@ -182,7 +182,7 @@
                 <td>{{ p.iditem }}</td>
                 <td>
                   @if (p.iditemNavigation?.temImagem) {
-                    <img class="miniatura-produto" [src]="api.imagemUrl(p.iditem)" [alt]="'Foto de ' + p.iditemNavigation?.item1" />
+                    <img class="miniatura-produto" [src]="imagemUrlProduto(p.iditem)" [alt]="'Foto de ' + p.iditemNavigation?.item1" />
                   } @else { — }
                 </td>
                 <td>{{ p.iditemNavigation?.item1 }}</td>
