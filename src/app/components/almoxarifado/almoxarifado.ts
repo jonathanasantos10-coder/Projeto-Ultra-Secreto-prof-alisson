@@ -163,6 +163,10 @@ export class Almoxarifado {
     });
   }
 
+  imagemUrlProduto(iditem: number): string {
+    return this.api.imagemUrl(iditem);
+  }
+
   selecionarImagem(event: Event): void {
     const input = event.target as HTMLInputElement;
     this.arquivoImagem = input.files?.[0] ?? null;
