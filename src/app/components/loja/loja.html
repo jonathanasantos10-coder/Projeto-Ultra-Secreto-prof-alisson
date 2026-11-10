@@ -19,8 +19,8 @@
       <a routerLink="/loja">Voltar ao catálogo</a>
       <p class="eyebrow">{{ i.tipoItem === 'P' ? 'Produto' : 'Serviço' }} #{{ i.iditem }}</p>
       <h2>{{ i.item1 }}</h2>
-      @if (i.temImagem) {
-        <img class="imagem-detalhe" [src]="imagemUrl(i.iditem)" [alt]="'Foto de ' + i.item1" />
+      @if (!imagemIndisponivel(i.iditem)) {
+        <img class="imagem-detalhe" [src]="imagemUrl(i.iditem)" [alt]="'Foto de ' + i.item1" (error)="imagemFalhou(i.iditem)" />
       }
       <p>{{ i.descricaoItem }}</p>
       <p>Categoria: {{ i.idcategoriaNavigation?.categoria }}</p>
@@ -68,8 +68,8 @@
     <div class="grade-catalogo">
       @for (i of itens(); track i.iditem) {
         <article class="painel cartao-item">
-          @if (i.temImagem) {
-            <img class="imagem-produto" [src]="imagemUrl(i.iditem)" [alt]="'Foto de ' + i.item1" />
+          @if (!imagemIndisponivel(i.iditem)) {
+            <img class="imagem-produto" [src]="imagemUrl(i.iditem)" [alt]="'Foto de ' + i.item1" (error)="imagemFalhou(i.iditem)" />
           } @else {
             <div class="simbolo">{{ i.tipoItem }}</div>
           }
