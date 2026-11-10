@@ -22,6 +22,7 @@ export class Loja {
   nome = '';
   tipo = '';
   idcategoria: number | null = null;
+  private imagensIndisponiveis = new Set<number>();
   constructor(
     private api: AlmoxarifadoService,
     public carrinho: CarrinhoService,
@@ -84,6 +85,14 @@ export class Loja {
   }
   imagemUrl(iditem: number): string {
     return this.api.imagemUrl(iditem);
+  }
+
+  imagemIndisponivel(iditem: number): boolean {
+    return this.imagensIndisponiveis.has(iditem);
+  }
+
+  imagemFalhou(iditem: number): void {
+    this.imagensIndisponiveis.add(iditem);
   }
 
   adicionar(item: ItemCatalogoModel) {
